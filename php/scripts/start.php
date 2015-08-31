@@ -410,8 +410,11 @@ sec_session_start();
                                 url:'cropper.php',
                                 method:'POST',
 								dataType: "json",
+								cache:false,
+								contentType:'application/json',
                                 data:{settings:json},
-                                success:function(data){alert(data);
+                                success:function(data){
+									
                                     if(data != false){
                                         formData1.append('location',data);
                                          $.ajax({

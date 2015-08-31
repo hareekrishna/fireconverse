@@ -1,6 +1,6 @@
 <?PHP 
 		if(isset($_POST['settings'])){
-			
+		
 			$settings=json_decode($_POST['settings']);
 			$original = getimagesize($settings['imgSrc']);
 			$name='temp'.time().'.jpg';
@@ -25,9 +25,10 @@
 				else echo false;
 				
 				}
-			else return false;
+			else echo false;
 			
-
+echo 44;
 		}
+		echo 32;
 		
 ?>
