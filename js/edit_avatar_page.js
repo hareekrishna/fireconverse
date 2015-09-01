@@ -1,6 +1,5 @@
 var flag=true;
 var data;
-alert(434);
 function sign(){
 	
 	$.ajax({
