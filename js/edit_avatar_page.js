@@ -1,7 +1,8 @@
 var flag=true;
 var data;
-
+alert(434);
 function sign(){
+	
 	$.ajax({
 		url:'infogiver.php',
 		method:"post",
