@@ -543,7 +543,8 @@ $privacy='0_0';
 					  $stmt->fetch();
 					  $password = hash('sha512', $s_password.$salt);  				
      				  $dirname=$u_ID;
-					  mkdir("../../data/userprofile/avatar/"."$dirname");		          		 
+					  mkdir("../../data/userprofile/avatar/".$dirname);
+					  mkdir("../../data/userprofile/topics/".$dirname);		          		 
 					 if($db_L2 == $password)
 					 {  
 						$email_xplode=explode("@",$s_email);

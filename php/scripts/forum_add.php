@@ -140,54 +140,66 @@ if(isset($_POST['topic_title'],$_POST['topic_content'],$_FILES['topic_pic'],$_PO
 			  
 		}
 	$time=time();
-	
+	$topic_array=array();
 	$t_title=htmlspecialchars($t_title);
 	$t_content=htmlspecialchars($t_content);
 	$t_content=preg_replace("/\s+/", " ",nl2br($t_content));
 	
 
 
-if($stmt=$mysqli->prepare("insert into `fireconverse`.`topics` (ID, ROOM_ID, CORNER_ID, topictitle, topic,date_of_topic) values(?,?,?,?,?,?)")){
+if($stmt=$mysqli->prepare("insert into `fireconverse`.`topics` (ID, ROOM_ID, CORNER_ID, topictitle,date_of_topic) values(?,?,?,?,?)")){
 	
-	$stmt->bind_param('iiissi',$U_ID,$room_id,$t_corner,$t_title,$t_content,$time);
+	$stmt->bind_param('iiisi',$U_ID,$room_id,$t_corner,$t_title,$time);
 	if($stmt->execute()){ 
 		$id = mysqli_insert_id($mysqli);
 		if($id){ 
 			if($_FILES['topic_pic']['name']){
-				$pic_name=array();
-				$pic_name=explode("\\",$_FILES['topic_pic']['name']);
-				$pic=end($pic_name);
-				$ext=".".end(explode(".",$pic));
-				$pic_name=$room_id."_".$id."_".$U_ID."_".$time;
-				$target='../../data/topics/'.$room_id.'/'; 
-				$pic_div=$target.$id;
-				mkdir($pic_div);
-				$pic_final=$pic_div."/".$pic_name.$ext;
 				
-				if(move_uploaded_file( $_FILES['topic_pic']['tmp_name'],$pic_final)){
-				$srcImage1=imagecreatefromjpeg($pic_final);
-				$reX=imagesx($srcImage1);
-				$reY=imagesy($srcImage1);
-			    $srcW=720;
-				if($reX>$srcW){
-					$temp=$reX/$srcW;
-					 $srcH=$reY/$temp;
+				$target='../../data/userprofile/topics'.$U_ID.'/'; 
+				$filename=$U_ID.'_'.$room_id.'_'.$t_corner.'_'.$id.'txt';
+				$dirname1=$target.$id.'/'.$filename;
+				if(mkdir($dirname1)){
+					$pic_div=$target.$id;
+					$pic_name=array();
+					$pic_name=explode("\\",$_FILES['topic_pic']['name']);
+					$pic=end($pic_name);
+					$ext=".".end(explode(".",$pic));
+					$pic_name='pic_'.$U_ID.'_'.$room_id.'_'.$t_corner.'_'.$id;
+					$pic_final=$pic_div."/".$pic_name.$ext;
+				
+					if(move_uploaded_file( $_FILES['topic_pic']['tmp_name'],$pic_final)){
+					$srcImage1=imagecreatefromjpeg($pic_final);
+					$reX=imagesx($srcImage1);
+					$reY=imagesy($srcImage1);
+					$srcW=720;
+					if($reX>$srcW){
+						$temp=$reX/$srcW;
+						 $srcH=$reY/$temp;
+					}
+					else {
+						$temp=$srcW/$reX;
+						 $srcH=$reY*$temp;
+						}
+				   
+					$dstImage1 = imagecreatetruecolor($srcW,$srcH);
+					imagecopyresampled($dstImage1,$srcImage1,0,0,0,0,$srcW,$srcH, $reX, $reY);
+					imagejpeg($dstImage1,$pic_final,90);
+					
+				if($stmt1=$mysqli->prepare("select `topics` from `fireconverse`.`meminfo` where `MEM_ID`='".$U_ID."'")){
+					if($stmt1->execute()){
+						$stmt1->bind_result($topic_array_temp);
+						$stmt1->store_result();
+						$stmt1->fetch();
+						if($temp_array_temp) $topic_array=unserialize($topic_array_temp);
+						array_push($topic_array,$id);
+						$topic_array_temp1=serialize($topic_array);
+						$stmt1->close();
+						$stmt1=$mysqli->prepare("update `fireconverse`.`meminfo` set `topics`=$topic_array_temp1 where `MEM_ID`='".$U_ID."'");
+						if($stmt->execute()) echo 'updated';
+						}
+					else echo "notupdated";
 				}
-				else {
-					$temp=$srcW/$reX;
-					 $srcH=$reY*$temp;
-					}
-			   
-				$dstImage1 = imagecreatetruecolor($srcW,$srcH);
-				imagecopyresampled($dstImage1,$srcImage1,0,0,0,0,$srcW,$srcH, $reX, $reY);
-				imagejpeg($dstImage1,$pic_final,90);
-				
-			if($stmt1=$mysqli->prepare("update `fireconverse`.`topics` set `data`='".$pic_final."' where `TOPIC_ID`='".$id."'")){
-				if($stmt1->execute()){
-					echo "updated";
-					}
-				else echo "notupdated";
-			}
+				} else echo 'not updated. file system error';
 			}
 			}
 			echo "updated";

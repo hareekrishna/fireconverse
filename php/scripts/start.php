@@ -297,7 +297,7 @@ sec_session_start();
                     processData: false,
                     contentType: false, 
                     data: formData,
-                    success: function(data){
+                    success: function(data){ alert(data);
                     flag=1;
                     if(data=='updated'){
                         $('#topic')[0].reset();
@@ -408,13 +408,13 @@ sec_session_start();
 							var json = JSON.stringify(settings);
                             $.ajax({
                                 url:'cropper.php',
-                                method:'POST',
-								dataType: "json",
+                                type:'post',
+								dataType:"json",
 								cache:false,
 								contentType:'application/json',
                                 data:{settings:json},
                                 success:function(data){
-									
+									alert(data);
                                     if(data != false){
                                         formData1.append('location',data);
                                          $.ajax({
@@ -488,7 +488,7 @@ sec_session_start();
             }
              }
              else{
-                 header("location:login3.php");
+                 header("location:loginPage.php");
              }
              $flag_tumb="";
                  $stmt_tumb_updater=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$u_ID");
