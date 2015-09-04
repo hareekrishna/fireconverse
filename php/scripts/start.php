@@ -11,6 +11,7 @@ sec_session_start();
         <script src="../../js/jquery.form.js"></script>
         <script src="../../js/jquery-ui.min.js"></script>
         <script src="../../js/quick_access.js" ></script>
+        
         <link rel="stylesheet" type="text/css" href="../../css/navbar.css" >
         <link rel="stylesheet" type="text/css" href="../../css/start.css">
     
@@ -393,7 +394,7 @@ sec_session_start();
                     $(".crop_done_button button").on("click",function(){
                         var settings ={};
                         var loc="../../data/corners/temp/";
-                        settings={
+                        settings={	
                             'location':loc,
                             'reduce_size':true,
                             'top':$(".crop_box").position().top,
@@ -405,17 +406,18 @@ sec_session_start();
                             'imgHeight':$(".crop_div_image img").height()
                             
                             };
-							var json = JSON.stringify(settings);
+							
                             $.ajax({
-                                url:'cropper.php',
-                                type:'post',
-								dataType:"json",
+								url:'cropper.php',
+								type:"POST",
 								cache:false,
-								contentType:'application/json',
-                                data:{settings:json},
-                                success:function(data){
+								dataType:"text",
+								async: false,
+								contentType: "application/x-www-form-urlencoded",
+								data:{settings:$(".crop_div_image img").attr("src")},
+								success:function(data){
 									alert(data);
-                                    if(data != false){
+                                    if(data == 'hari'){
                                         formData1.append('location',data);
                                          $.ajax({
                                             url :'forum_add.php' ,

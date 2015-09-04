@@ -195,7 +195,7 @@ if($stmt=$mysqli->prepare("insert into `fireconverse`.`topics` (ID, ROOM_ID, COR
 						$topic_array_temp1=serialize($topic_array);
 						$stmt1->close();
 						$stmt1=$mysqli->prepare("update `fireconverse`.`meminfo` set `topics`=$topic_array_temp1 where `MEM_ID`='".$U_ID."'");
-						if($stmt->execute()) echo 'updated';
+						if($stmt->execute()) echo 'updated'; 
 						}
 					else echo "notupdated";
 				}

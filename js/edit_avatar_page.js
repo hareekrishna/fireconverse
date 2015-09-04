@@ -716,7 +716,7 @@ $(".crop_done_button button").on("click",function(){
 						type:"POST",
 						cache:false,
 						data:{settings:settings},
-						success:function(data){
+						success:function(data){alert(data);
 							temp_location=data;
 							
 							if(temp_location != false){
