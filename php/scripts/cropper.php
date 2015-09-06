@@ -1,23 +1,22 @@
 <?PHP 
-echo $_POST['settings'];
-if(isset($_POST['width'])){ 
-			
-			$original = getimagesize($_POST['imgSrc']);
+if(isset($_POST['settings'])){
+			$settings=$_POST['settings'];
+			$original = getimagesize($settings['imgSrc']);
 			$name='temp'.time().'.jpg';
-			$location=$_POST['location'].$name;
+			$location=$settings['location'].$name;
 			if($original['mime']=='image/jpeg'){
-				$srcImage=imagecreatefromjpeg($_POST['imgSrc']);
+				$srcImage=imagecreatefromjpeg($settings['imgSrc']);
 				$reX=imagesx($srcImage);
 				$reY=imagesy($srcImage);
-				$imgWidth=$_POST['imgWidth'];
-				$imgHeight=$_POST['imgHeight'];
+				$imgWidth=$settings['imgWidth'];
+				$imgHeight=$settings['imgHeight'];
 				$mulX=$reX/$imgWidth;
 				$mulY=$reY/$imgHeight;
-				$srcW=$_POST['width']*$mulX;
-				$srcH=$_POST['height']*$mulY;
+				$srcW=$settings['width']*$mulX;
+				$srcH=$settings['height']*$mulY;
 				$dstImage = imagecreatetruecolor($srcW,$srcH);
-				$srcX=$_POST['left']*$mulX;
-				$srcY=$_POST['top']*$mulY;
+				$srcX=$settings['left']*$mulX;
+				$srcY=$settings['top']*$mulY;
 				imagecopy($dstImage, $srcImage, 0, 0, $srcX,$srcY, $srcW, $srcH);
 				if(imagejpeg($dstImage,$location,90)){
 					echo $location;
@@ -25,8 +24,12 @@ if(isset($_POST['width'])){
 				else echo false;
 				
 				}
-			else echo false;
+			else return false;
 			
+
 		}
 		
+		
 ?>
+
+   

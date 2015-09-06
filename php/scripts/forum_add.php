@@ -1,4 +1,5 @@
 <?PHP 
+print_r($_POST);
 if(!function_exists('sec_session_start')){
 			function sec_session_start() {
 			$session_name = 'sec_session_id';
@@ -216,11 +217,11 @@ if($stmt=$mysqli->prepare("insert into `fireconverse`.`topics` (ID, ROOM_ID, COR
 
 
 	
-	}
-	if(isset($_POST['corner_name'],$_POST['corner_desc'],$_POST['corner_room'],$_POST['location'])){
+	} echo 323;
+	if(isset($_POST['corner_name'],$_POST['corner_desc'],$_POST['location'])){
 		$c_title=$_POST['corner_name'];
 		$c_desc=$_POST['corner_desc'];
-		$c_room=$_POST['corner_room'];
+		$c_room=$_POST['corner_room']; 
 		switch($c_room){
 		case "room_sports":
 			$room_id=1;

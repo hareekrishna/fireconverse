@@ -25,49 +25,55 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 	 $u_name=$_SESSION['u_name'];
 	 
 	 $json='[';
-	 if(($_POST['flag']=="show_responses") && $_POST['topic_id']){
+	 if(($_POST['flag']=="show_responses") && isset($_POST['topic_id'],$_POST['count_res']) ){
 		 $topic_id=$_POST['topic_id'];
 		 
-		 if(($stmt=$mysqli->prepare("select * from `fireconverse`.`responses` where TOPIC_ID='".$topic_id."' "))&& ($stmt->execute())){
+		 if(($stmt=$mysqli->prepare("select `TOPIC_ID`,`ID`,`ROOM_ID`,`CORNER_ID` from `fireconverse`.`topics` where TOPIC_ID='".$topic_id."' "))&& ($stmt->execute())){
 				
 				$stmt->store_result();
-				$stmt->bind_result($res_id,$mem_ID,$topic_id,$res_text,$date_of_res,$data);
-				while($stmt->fetch()){
-					if(($stmt1=$mysqli->prepare("select `name` from fireconverse.members where ID='".$mem_ID."'")) && ($stmt1->execute())){
-						$stmt1->store_result();
-						$stmt1->bind_result($mem_name);
-						$stmt1->fetch();
-						if($mem_name) {
-							 $stmt_tumb=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$mem_ID");
-							 if($stmt_tumb){
-								 $stmt_tumb->execute();
-								 $stmt_tumb->store_result();
-								 $stmt_tumb->bind_result($tumb);
-								 $stmt_tumb->fetch();
-								 }
+				$stmt->bind_result($topic_id,$mem_ID,$room_id,$corner_id);
+				$stmt->fetch();
+				if($topic_id){
+					$stmt->close();
+					$filename=$mem_ID.'_'.$room_id.'_'.$corner_id.'_'.$topic_id.'.txt';
+					
+					foreach($topic_array['responses'] as $reponses_array){
+						
+						if(($stmt1=$mysqli->prepare("select `name` from fireconverse.members where ID='".$responses_array['mem_ID']."'")) && ($stmt1->execute())){
+							$stmt1->store_result();
+							$stmt1->bind_result($mem_name);
+							$stmt1->fetch();
+							if($mem_name) {
+								 $stmt_tumb=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$mem_ID");
+								 if($stmt_tumb){
+									 $stmt_tumb->execute();
+									 $stmt_tumb->store_result();
+									 $stmt_tumb->bind_result($tumb);
+									 $stmt_tumb->fetch();
+									 }
+								}
 							}
-						}
-					 
-					 if($json !='['){
-					 $json.=',';
-						 }
 						 
-						 
-							 $date=date("j \of F Y",$date_of_res);
+						 if($json !='['){
+						 $json.=',';
+							 }
 							 
-							 $json.='{"res_id":"'.$res_id.'",';
-							 $json.='"ID":"'.$mem_ID.'",';
-							 $json.='"mem_name":"'.$mem_name.'",';
-							 $json.='"mem_tumb":"'.$tumb.'",';
-							 $json.='"topic_id":"'.$topic_id.'",';
-							 $json.='"res_text":"'.$res_text.'",';
-							 $json.='"date_of_res":"'.$date.'"}';
-					 
+							 
+								 $date=date("j \of F Y",$date_of_res);
+								 
+								 $json.='{"res_id":"'.$responses_array['res_id'].'",';
+								 $json.='"ID":"'.$mem_ID.'",';
+								 $json.='"mem_name":"'.$mem_name.'",';
+								 $json.='"mem_tumb":"'.$tumb.'",';
+								 $json.='"topic_id":"'.$topic_id.'",';
+								 $json.='"res_text":"'.$responses_array['res_text'].'",';
+								 $json.='"date_of_res":"'.$responses_array['date'].'"}';
+						 
+					}
 				}
-			
 			}
-			$json.=']';
-			echo $json;
+				$json.=']';
+				echo $json;
 		 }
 	 if(($_POST['flag']=='topics_list') && $_POST['configaration']){
 		 $config=$_POST['configaration'];
@@ -81,14 +87,20 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 			if(($stmt=$mysqli->prepare("select * from `fireconverse`.`topics` where ID=$U_ID "))&& ($stmt->execute())){
 				
 				$stmt->store_result();
-				$stmt->bind_result($topic_id,$U_ID_t1,$room_id,$corner_id,$t_title,$topic,$t_date,$data,$liker,$disliker);
+				$stmt->bind_result($topic_id,$U_ID_t1,$room_id,$corner_id,$t_title,$t_date);
 				while($stmt->fetch()){
 					 if($json !='['){
 					 $json.=',';
 					 }
+				$filename=$U_ID_t1.'_'.$room_id.'_'.$corner_id.'_'.$topic_id.'.txt';
+				$topic_array;
+				$t_title=$topic_array['topic_title'];
+				$topic=$topic_array['topic'];
+				$t_date=$topic_array['date'];
+				$data=$topic_array['location'];
 			    $likes_no=$dislikes_no=$liked=0; 
 				if($liker){
-					$likers_temp=unserialize($liker);
+					$likers_temp=$topic_array['likes'];
 					$likes_no=sizeof($likers_temp);
 					if(in_array($U_ID,$likers_temp)){
 					$liked=1;
@@ -96,7 +108,7 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 					
 				   }
 				if($disliker){
-					$dislikers_temp=unserialize($disliker);
+					$dislikers_temp=$topic_array['dislikes'];
 					$dislikes_no=sizeof($dislikers_temp); 
 					if(in_array($U_ID,$dislikers_temp)){
 						$liked=-1;
@@ -235,7 +247,7 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 			$room_id=$_POST['room_id'];
 			if(($stmt=$mysqli->prepare("select * from `fireconverse`.`corner` where `ROOM_ID`='".$room_id."'")) && ($stmt->execute())){
 				$stmt->store_result();
-				$stmt->bind_result($corner_id,$admin_id1,$room_id,$corner_name,$corner_desc,$data,$topic_id,$followers,$time);
+				$stmt->bind_result($corner_id,$admin_id1,$room_id,$corner_name,$corner_desc,$data,$topic_id,$followers,$time,$heat);
 				 while($stmt->fetch()){
 			 		 if($json !='['){
 					 $json.=',';
@@ -253,7 +265,8 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 				 $json.='"banner_pic":"'.$data.'",';
 				 $json.='"topic_id":"'.$topic_id.'",';
 				 $json.='"followers":"'.$followers.'",';
-				 $json.='"time":"'.$date.'"}';
+				 $json.='"time":"'.$date.'",';
+				 $json.='"heat":"'.$heat.'"}';
 			
 			
   			 }
@@ -458,7 +471,7 @@ if(($_POST['flag']=="corner_info") && (isset($_POST['corner_id']))){
 		$forum_id=$_POST['corner_id_single'];
 	   if(($stmt=$mysqli->prepare("select * from `fireconverse`.`corner` where `CORNER_ID`=$forum_id")) && ($stmt->execute())){
 		 $stmt->store_result(); 
-		 $stmt->bind_result($forum_id,$admin_id,$room_id,$corner_name,$corner_desc,$data,$topic_id,$followers,$time_c);
+		 $stmt->bind_result($forum_id,$admin_id,$room_id,$corner_name,$corner_desc,$data,$topic_id,$followers,$time_c,$heat);
 		 while($stmt->fetch()){
 			 if($json !='['){
 					 $json.=',';
@@ -473,7 +486,8 @@ if(($_POST['flag']=="corner_info") && (isset($_POST['corner_id']))){
 			 $json.='"banner_pic":"'.$data.'",';
 			 $json.='"topic_id":"'.$topic_id.'",';
 			 $json.='"followers":"'.$followers.'",';
-			 $json.='"time":"'.$date.'"}';
+			 $json.='"time":"'.$date.'",';
+			 $json.='"heat":"'.$heat.'"}';
 		}
 			$json.=']';
 			echo $json;

@@ -269,15 +269,15 @@ sec_session_start();
                     }
                 
                 if(flag==0){
-                 $('#topic').on('submit', function(e) { 
-                    e.preventDefault();
+                 $("#topic").on('submit', function(e) { 
+                    e.preventDefault(); 
                     var formData = new FormData($(this)[0]);
                     var corner_id=0;
                     if($(".corner_include").length){
                         var temp=$(".corner_include").attr("id");
                         corner_id=temp.split("_").pop();
                         }
-                    formData.append('topic_corner',parseInt(corner_id));
+                  formData.append('topic_corner',parseInt(corner_id));
                     formData.append('topic_room',t_room);
                 $(document).ajaxStart(function(){
                     if($("#start_topic .loading_pic").length==0){
@@ -289,42 +289,39 @@ sec_session_start();
                         $("#start_topic .loading_pic").remove();
                         }
                 });
-                        
-        
                 $.ajax({
-                    
-                    url :'forum_add.php' ,
-                    type: "POST",
-                    processData: false,
-                    contentType: false, 
-                    data: formData,
-                    success: function(data){ alert(data);
-                    flag=1;
-                    if(data=='updated'){
-                        $('#topic')[0].reset();
-                        $(".imagePreview,.remove_button").fadeOut();
-                        $(".imagePreview").attr("src","");
-                        if($(".success").length==0){
-                              $(".start_outer").prepend("<div class='success'><h1>Successfuly done!</h1></div>").hide().fadeIn();
-                            }
-                        }
-                        
-                    if(data=='notupdated')
-                    {
-                        alert('Oops! Something Wrong occured.Try again.');
-                        }
-                    
-                    },
-                    error: function (jXHR, textStatus, errorThrown) {
-                        alert(errorThrown);
-                    }
-                });
-                
-                 
-            });
-                }
-                
-                });
+					url :'forum_add.php' ,
+					type: "POST",
+					processData: false,
+					contentType: false, 
+					data: formData,
+					success: function(data){
+					flag=1;
+					if(data=='updated'){
+						$('#topic')[0].reset();
+						$(".imagePreview,.remove_button").fadeOut();
+						$(".imagePreview").attr("src","");
+						if($(".success").length==0){
+							  $(".start_outer").prepend("<div class='success'><h1>Successfuly done!</h1></div>").hide().fadeIn();
+							}
+						}
+						
+					if(data=='notupdated')
+					{
+						alert('Oops! Something Wrong occured.Try again.');
+						}
+					
+					},
+					error: function (jXHR, textStatus, errorThrown) {
+						alert(errorThrown);
+					}
+				});
+				
+				 
+			});
+				}
+				
+				});
                 <!----------groups------>
             
             $("div #start_corner .footer_field").on("click",".button",function(){
@@ -368,6 +365,7 @@ sec_session_start();
                  $('#corner').on('submit', function(e){
                     e.preventDefault();
                     var formData1= new FormData($(this)[0]);
+					
                     formData1.append('corner_room',t_room);
                 $(document).ajaxStart(function(){
                     if($("#start_corner .loading_pic").length==0){
@@ -380,88 +378,85 @@ sec_session_start();
                         }
                 });
                 if(flag==0){
-                    var imagePreview=$("#start_corner .imagePreview").attr("src");
-                    $(".crop_div_image img").attr("src",imagePreview);
-                    $(".crop_div_outer , #splash").fadeIn(700);
-                    $(".crop_box").draggable({containment:"parent"});
-                    var w=$(".crop_div_image img").width();
-                    var h=$(".crop_div_image img").height();
-                    $(".crop_box").width(w*0.98).height(w*0.20);
-                    $(".crop_div_image").width(w).height(h);
-                    $("#splash").on("click",function(){
-                        $(".crop_div_outer,#splash").fadeOut(700);
-                        });
-                    $(".crop_done_button button").on("click",function(){
-                        var settings ={};
-                        var loc="../../data/corners/temp/";
-                        settings={	
-                            'location':loc,
-                            'reduce_size':true,
-                            'top':$(".crop_box").position().top,
-                            'left':$(".crop_box").position().left,
-                            'width':$(".crop_box").width(),
-                            'height':$(".crop_box").height(),
-                            'imgSrc':$(".crop_div_image img").attr("src"),
-                            'imgWidth':$(".crop_div_image img").width(),
-                            'imgHeight':$(".crop_div_image img").height()
-                            
-                            };
-							
-                            $.ajax({
-								url:'cropper.php',
-								type:"POST",
-								cache:false,
-								dataType:"text",
-								async: false,
-								contentType: "application/x-www-form-urlencoded",
-								data:{settings:$(".crop_div_image img").attr("src")},
-								success:function(data){
-									alert(data);
-                                    if(data == 'hari'){
-                                        formData1.append('location',data);
-                                         $.ajax({
-                                            url :'forum_add.php' ,
-                                            type: "POST",
-                                            processData: false,
-                                            contentType: false, 
-                                            data: formData1,
-                                            success: function(data){alert(data);
-                                            flag=1;
-                                            if(data=='notupdated'){
-                                                alert('Oops! Something Wrong occured.Try again.');
-                                                }
-                                            else{
-                                                
-                                                $(".crop_div_outer,#splash").fadeOut(700);
-                                                $('#corner')[0].reset();
-                                                if($(".success").length==0){
-                                                      $(".start_outer").prepend("<div class='success'><h1>Successfuly done!</h1></div>").hide().fadeIn();
-                                                    }
-                                                var link_to="corner.php?cid="+parseInt(data);
-                                                window.location.replace(link_to);
-                                                }
-                                                
-                                            
-                                            },
-                                            error: function (jXHR, textStatus, errorThrown) {
-                                                alert(errorThrown);
-                                            }
-                                        });
-                                    }
-                                },
-                                error:function(jXHR,textStatus,errorThrown){
-                                    alert(errorThrown);
-                                    }
-                                    
-                                });
-                        
-                        });
-               
-                }
-                 
-            });
-                
-                });
+					
+                   
+				var imagePreview=$("#start_corner .imagePreview").attr("src");
+				$(".crop_div_image img").attr("src",imagePreview);
+				$(".crop_div_outer , #splash").fadeIn(700);
+				$(".crop_box").draggable({containment:"parent"});
+				var w=$(".crop_div_image img").width();
+				var h=$(".crop_div_image img").height();
+				$(".crop_box").width(w*0.98).height(w*0.20);
+				$(".crop_div_image").width(w).height(h);
+				$("#splash").on("click",function(){
+					$(".crop_div_outer,#splash").fadeOut(700);
+					});
+				$(".crop_done_button button").on("click",function(){
+					var settings ={};
+					var loc="../../data/corners/temp/";
+					settings={
+						'location':loc,
+						'reduce_size':true,
+						'top':$(".crop_box").position().top,
+						'left':$(".crop_box").position().left,
+						'width':$(".crop_box").width(),
+						'height':$(".crop_box").height(),
+						'imgSrc':$(".crop_div_image img").attr("src"),
+						'imgWidth':$(".crop_div_image img").width(),
+						'imgHeight':$(".crop_div_image img").height()
+						
+						};
+						$.ajax({
+							url:'cropper.php',
+							type:"POST",
+							cache:false,
+							data:{settings:settings},
+							success:function(data){
+								if(data != false){
+									formData1.append('location',data);
+									 $.ajax({
+										url :'forum_add.php' ,
+										type: "POST",
+										processData: false,
+										contentType: false, 
+										data: formData1,
+										success: function(data){alert(data);
+										flag=1;
+										if(data=='notupdated'){
+											alert('Oops! Something Wrong occured.Try again.');
+											}
+										else{
+											
+											$(".crop_div_outer,#splash").fadeOut(700);
+											$('#corner')[0].reset();
+											if($(".success").length==0){
+												  $(".start_outer").prepend("<div class='success'><h1>Successfuly done!</h1></div>").hide().fadeIn();
+												}
+											var link_to="corner.php?cid="+parseInt(data);
+											window.location.replace(link_to);
+											}
+											
+										
+										},
+										error: function (jXHR, textStatus, errorThrown) {
+											alert(errorThrown);
+										}
+									});
+								}
+							},
+							error:function(jXHR,textStatus,errorThrown){
+								alert(errorThrown);
+								}
+								
+							});
+					
+					});
+		   
+			}
+			 
+		});
+			
+			});
         // crop function
             
             
@@ -475,8 +470,11 @@ sec_session_start();
             }
         </script>
 		<?PHP 
+		ini_set('post_max_size', '10M');
+		ini_set('upload_max_filesize', '10M');
         include 'login_status.php';
         require_once 'csign.php';
+		
          $verified_corner_name="";
              $verified_room="";
              $verified_corner_name_1="";	
@@ -691,7 +689,7 @@ sec_session_start();
                                 <div class="st_t_title"><p>Include in</p></div>
                                 <div class="st_t_s"><p>:</p></div>
                                  <div class="st_t_i">
-                                    <input type="text" name="topic_corner" class='st_textbox' maxlength="100" />
+                                    <input type="text" name="topic_corner" value='0' class='st_textbox' maxlength="100" />
                                  </div>
                                  <div class="corner_inclusion"></div>
                         </div>
