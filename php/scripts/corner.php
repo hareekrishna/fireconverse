@@ -39,6 +39,36 @@ function getURLparams(URL){
 		}
 	return params;
 	} 
+function room_on_nav(room_id){
+	var back_color='',
+		border_bottom='',
+		back_color_div='',
+		border_side='',
+		text='';
+	
+	switch(room_id){
+		case 1:
+			text='Sports';
+			break;
+		case 2:
+			text='Health';
+			break;
+		case 3:
+			text='Movies';
+			break;
+		case 4:
+			text='Fashion';
+			break;
+		case 5:
+			text='Tech';
+			break;
+		default:
+			text='Sports';
+			break;
+			
+		}
+	var append="";
+	}
 function corner_info(){
 	var url_info=getURLparams(window.location.search);
 	if(url_info['cid']==""){
@@ -66,7 +96,8 @@ function corner_info(){
 					var link_to="start.php#topic?cid="+corner_id;
 					mem_name(info[0].admin_id,function(admin_name){
 						$("#c_admin .f_t_v").html(admin_name);
-						});					
+						});		
+					room_on_nav(info[0].room_id);			
 					$("#st_t a").attr("href",link_to);
 					$(".banner_pic_img").attr("src",info[0].banner_pic);
 					$(".title_container h1").html(info[0].corner_name);

@@ -25,9 +25,12 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 	 $u_name=$_SESSION['u_name'];
 	 
 	 $json='[';
-	 if(($_POST['flag']=="show_responses") && isset($_POST['topic_id'],$_POST['count_res']) ){
+	 
+	 
+	 if(($_POST['flag']=="show_responses") && isset($_POST['topic_id'],$_POST['count_res_start'],$_POST['count_res_end']) ){
 		 $topic_id=$_POST['topic_id'];
-		 
+		 $s=$_POST['count_res_start'];
+		 $e=$_POST['count_res_end'];
 		 if(($stmt=$mysqli->prepare("select `TOPIC_ID`,`ID`,`ROOM_ID`,`CORNER_ID` from `fireconverse`.`topics` where TOPIC_ID='".$topic_id."' "))&& ($stmt->execute())){
 				
 				$stmt->store_result();
@@ -35,45 +38,50 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 				$stmt->fetch();
 				if($topic_id){
 					$stmt->close();
-					$filename=$mem_ID.'_'.$room_id.'_'.$corner_id.'_'.$topic_id.'.txt';
-					
-					foreach($topic_array['responses'] as $reponses_array){
-						
-						if(($stmt1=$mysqli->prepare("select `name` from fireconverse.members where ID='".$responses_array['mem_ID']."'")) && ($stmt1->execute())){
-							$stmt1->store_result();
-							$stmt1->bind_result($mem_name);
-							$stmt1->fetch();
-							if($mem_name) {
-								 $stmt_tumb=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$mem_ID");
-								 if($stmt_tumb){
-									 $stmt_tumb->execute();
-									 $stmt_tumb->store_result();
-									 $stmt_tumb->bind_result($tumb);
-									 $stmt_tumb->fetch();
-									 }
+					$filename="../../data/userprofile/topics/".$mem_id."/".$topic_id."/".$mem_id."_".$room_id."_".$corner_id."_".$topic_id.".txt";
+					if(file_exists($filename)){
+						$topic_array_file=json_decode(file_get_contents($filename));
+						$res_array_file=$topic_array_file['res_array'];
+						for($i=$s;$i<=$e;$i++){
+							$reponses_array=$res_array_file[$i];
+							if(($stmt1=$mysqli->prepare("select `name` from fireconverse.members where ID='".$responses_array['U_ID']."'")) && ($stmt1->execute())){
+								$stmt1->store_result();
+								$stmt1->bind_result($mem_name);
+								$stmt1->fetch();
+								if($mem_name) {
+									 $stmt_tumb=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$mem_ID");
+									 if($stmt_tumb){
+										 $stmt_tumb->execute();
+										 $stmt_tumb->store_result();
+										 $stmt_tumb->bind_result($tumb);
+										 $stmt_tumb->fetch();
+										 }
+									}
 								}
-							}
-						 
-						 if($json !='['){
-						 $json.=',';
-							 }
 							 
-							 
-								 $date=date("j \of F Y",$date_of_res);
+							 if($json !='['){
+							 $json.=',';
+								 }
 								 
-								 $json.='{"res_id":"'.$responses_array['res_id'].'",';
-								 $json.='"ID":"'.$mem_ID.'",';
-								 $json.='"mem_name":"'.$mem_name.'",';
-								 $json.='"mem_tumb":"'.$tumb.'",';
-								 $json.='"topic_id":"'.$topic_id.'",';
-								 $json.='"res_text":"'.$responses_array['res_text'].'",';
-								 $json.='"date_of_res":"'.$responses_array['date'].'"}';
-						 
+								 
+									 $date=date("j \of F Y",$res_time);
+									 
+									 $json.='{"res_id":"'.$responses_array['res_id'].'",';
+									 $json.='"ID":"'.$responses_array['U_ID'].'",';
+									 $json.='"mem_name":"'.$mem_name.'",';
+									 $json.='"mem_tumb":"'.$tumb.'",';
+									 $json.='"topic_id":"'.$topic_id.'",';
+									 $json.='"res_text":"'.$responses_array['res_content'].'",';
+									 $json.='"date_of_res":"'.$responses_array['date'].'"}';
+							 
+						}
+					
 					}
+					else $error="file not found";
 				}
 			}
-				$json.=']';
-				echo $json;
+			$json.=']';
+			echo $json;
 		 }
 	 if(($_POST['flag']=='topics_list') && $_POST['configaration']){
 		 $config=$_POST['configaration'];
@@ -92,60 +100,64 @@ if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['
 					 if($json !='['){
 					 $json.=',';
 					 }
-				$filename=$U_ID_t1.'_'.$room_id.'_'.$corner_id.'_'.$topic_id.'.txt';
-				$topic_array;
-				$t_title=$topic_array['topic_title'];
-				$topic=$topic_array['topic'];
-				$t_date=$topic_array['date'];
-				$data=$topic_array['location'];
-			    $likes_no=$dislikes_no=$liked=0; 
-				if($liker){
-					$likers_temp=$topic_array['likes'];
-					$likes_no=sizeof($likers_temp);
-					if(in_array($U_ID,$likers_temp)){
-					$liked=1;
+				$filename="../../data/userprofile/topics/".$U_ID_t1."/".$topic_id."/".$U_ID_t1."_".$room_id."_".$corner_id."_".$topic_id.".txt";
+					if(file_exists($filename) && $topic_array_file=json_decode(file_get_contents($filename),true)){
+						
+						
+						$t_title=$topic_array_file['topic_title'];
+						$topic=$topic_array_file['topic_content'];
+						$t_date=$topic_array_file['topic_time'];
+						$data=$topic_array_file['topic_pic'];
+						$corner_id=$topic_array_file['CORNER_ID'];
+						$likes_no=$liked=$dislikes_no=0; 
+						if($topic_array_file['likers']){
+							$likers_temp=$topic_array_file['likers'];
+							$likes_no=sizeof($likers_temp);
+							if(in_array($U_ID,$likers_temp)){
+							$liked=1;
+								}
+							
+						   }
+						if($topic_array_file['dislikers']){
+							$dislikers_temp=$topic_array_file['dislikers'];
+							$dislikes_no=sizeof($dislikers_temp); 
+							if(in_array($U_ID,$dislikers_temp)){
+								$liked=-1;
+								}
+						}	
+						if($U_ID_t1==$U_ID) $auth=1;
+						else $auth=0;
+						if($corner_id){
+							if(($stmt1=$mysqli->prepare("select `corner_name` from `fireconverse`.`corner` where CORNER_ID=$corner_id "))&& ($stmt1->execute())){
+							
+							$stmt1->store_result();
+							$stmt1->bind_result($corner_name);
+							$stmt1->fetch();
+								}
 						}
-					
-				   }
-				if($disliker){
-					$dislikers_temp=$topic_array['dislikes'];
-					$dislikes_no=sizeof($dislikers_temp); 
-					if(in_array($U_ID,$dislikers_temp)){
-						$liked=-1;
+						else{
+							$corner_name="";
+							}
+						
+						 $date=date("j \of F Y",$t_date);
+						 $json.='{"topic_id":"'.$topic_id.'",';
+						 $json.='"ID":"'.$U_ID_t1.'",';
+						 $json.='"auth":"'.$auth.'",';
+						 $json.='"room_id":"'.$room_id.'",';
+						 $json.='"corner_id":"'.$corner_id.'",';
+						 $json.='"corner_name":"'.$corner_name.'",';
+						 $json.='"t_title":"'.$t_title.'",';
+						 $json.='"topic":"'.$topic.'",';
+						 $json.='"t_date":"'.$date.'",';
+						 $json.='"data":"'.$data.'",';
+						 $json.='"likes":"'.$likes_no.'",';
+						 $json.='"dislikes":"'.$dislikes_no.'",';	
+						 $json.='"liked":"'.$liked.'"}';			
+							}
 						}
-				}	
-				if($U_ID_t1==$U_ID) $auth=1;
-				else $auth=0;
-				if($corner_id){
-					if(($stmt1=$mysqli->prepare("select `corner_name` from `fireconverse`.`corner` where CORNER_ID=$corner_id "))&& ($stmt1->execute())){
-					
-					$stmt1->store_result();
-					$stmt1->bind_result($corner_name);
-					$stmt1->fetch();
-						}
-				}
-				else{
-					$corner_name="";
-					}
-				
-				 $date=date("j \of F Y",$t_date);
-				 $json.='{"topic_id":"'.$topic_id.'",';
-				 $json.='"ID":"'.$U_ID_t1.'",';
-				 $json.='"auth":"'.$auth.'",';
-				 $json.='"room_id":"'.$room_id.'",';
-				 $json.='"corner_id":"'.$corner_id.'",';
-				 $json.='"corner_name":"'.$corner_name.'",';
-				 $json.='"t_title":"'.$t_title.'",';
-				 $json.='"topic":"'.$topic.'",';
-				 $json.='"t_date":"'.$date.'",';
-				 $json.='"data":"'.$data.'",';
-				 $json.='"likes":"'.$likes_no.'",';
-				 $json.='"dislikes":"'.$dislikes_no.'",';	
-				 $json.='"liked":"'.$liked.'"}';			
-					}
-				}
-			$json.=']';
-			echo ($json);
+					$json.=']';
+					echo ($json);
+			}
 			 
 		 }
 	 if(($_POST['flag']=='corner_topics_list') && $_POST['configaration']){

@@ -689,7 +689,7 @@ sec_session_start();
                                 <div class="st_t_title"><p>Include in</p></div>
                                 <div class="st_t_s"><p>:</p></div>
                                  <div class="st_t_i">
-                                    <input type="text" name="topic_corner" value='0' class='st_textbox' maxlength="100" />
+                                    <input type="text" name="topic_corner"  class='st_textbox' maxlength="100" />
                                  </div>
                                  <div class="corner_inclusion"></div>
                         </div>
