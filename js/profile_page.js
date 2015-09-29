@@ -48,8 +48,14 @@ function tumb(){
 			},
 		success: function(data){	
 			var f=JSON.parse(data);
-			$("#avatar_navbar").attr("src",f[0].tumb);
-			$("#cover_pic_main").attr("src",f[0].wrapper);
+			
+			if(!f[0].wrapper==false)
+				$("#cover_pic_main").attr("src",f[0].wrapper);
+			else {
+				$("#cover_pic_main").hide();
+				$("#cover_pic").append("");
+				}
+				
 			$("#user_avatar").attr("src",f[0].tumb);
 			$(".status_main").append(f[0].status);
 			
@@ -70,6 +76,7 @@ function admin(){
 			mem_ID:true
 			},
 		success: function(data){
+			if(data=='') $("#no_corner").css({'display':'block'}).html("You haven't started any corner yet.");
 			if(data == "notfound"){
 				alert("Oops! Something went wrong");
 				}
@@ -116,6 +123,7 @@ function corners_info(corners_id,fn){
 	}
 function mem_info(id_list,fn){
 	var info1;
+	
 	$.ajax({
 		url:'infogiver.php',
 		method:'post',
@@ -138,14 +146,15 @@ function mem_info(id_list,fn){
 	
 	}
 function topics_list(configaration){
-	var configaration=configaration;var info1;
+	var configaration=configaration;
+	var info1;
 	if(configaration){
 		$.ajax({
 			url:'infogiver.php',
 			method:'post',
 			dataType:"html",
 			data:{
-				flag:'topics_list',
+				flag:'topics_list_total',
 				configaration:configaration
 				},
 			success:function(data){ 
@@ -157,10 +166,11 @@ function topics_list(configaration){
 					var i=0,flag,liked='../../mydata/pics/like.png';
 					var topic_info=[];
 					
-					if(info){
+					if(info !=''){
 						
 						var append_div="<ul class='topics_list_main'></ul>";
 						$(".topics_list").append(append_div);
+						
 						$.each(info,function(index,val){
 							if(id_list.indexOf(info[index].ID) == -1){
 								
@@ -170,46 +180,39 @@ function topics_list(configaration){
 							}
 							});
 						
-					mem_info(id_list,function(mem_info_list){
+					
 						$.each(info,function(index,val){
 							flag=0;
 							switch(info[index].room_id){
-								case '1':
+								case 1:
 									topic_info['room_id']='Sports';
 									break;
-								case '2':
+								case 2:
 									topic_info['room_id']='Health';
 									break;
-								case '3':
+								case 3:
 									topic_info['room_id']='Movies';
 									break;
-								case '4':
+								case 4:
 									topic_info['room_id']='Fashion';
 									break;
-								case '5':
+								case 5:
 									topic_info['room_id']='Tech';
 									break;
 								default:flag=1;
 							}
 							if(flag) return;
 							
-							$.each(mem_info_list,function(index1,val){
-								if(mem_info_list[index1].ID == info[index].ID){
-									topic_info['tumb']=mem_info_list[index1].tumb;
-									topic_info['u_name']=mem_info_list[index1].u_name;	
-									}
-								});
-								
 							switch(info[index].liked){
-								case '1':	
+								case 1:	
 										liked="../../mydata/pics/liked.png";
 										liked_id='liked_i';
 										break;
-								case '-1':
+								case -1:
 										liked="../../mydata/pics/disliked.png";
 										liked_id='disliked_i';
 										break;
-								case '0':
+								case 0:
 										liked="../../mydata/pics/like.png";
 										liked_id='like_i';
 										break;
@@ -221,7 +224,7 @@ function topics_list(configaration){
 												+"<span class='t_li_h_d'><img src='../../mydata/pics/arrow.png' /></span>"
 												+"<a href='corner.php?cid="+info[index].corner_id+"'><p class='t_li_h_c'>"+info[index].corner_name+"</p></a>"
 												+"<span class='t_li_h_d'><img src='../../mydata/pics/arrow.png' /></span>"
-												+"<p class='t_li_h_u'>"+topic_info['u_name']+"</p>"
+												+"<p class='t_li_h_u'>"+info[index].name+"</p>"
 												+"<p class='t_li_h_t'>"+info[index].t_date+"</p></div>";
 												+"<div class='t_li_b'>";
 							}
@@ -231,7 +234,7 @@ function topics_list(configaration){
 												+"<p class='t_li_h_r'>"+topic_info['room_id']+"</p>"
 												+"<span class='t_li_h_d'><img src='../../mydata/pics/arrow.png' /></span>"
 												
-												+"<p class='t_li_h_u'>"+topic_info['u_name']+"</p>"
+												+"<p class='t_li_h_u'>"+info[index].name+"</p>"
 												+"<p class='t_li_h_t'>"+info[index].t_date+"</p></div>";
 												+"<div class='t_li_b'>";
 								}
@@ -243,17 +246,35 @@ function topics_list(configaration){
 										  +"<div class='t_li_b_m'>"
 										  +"<div class='t_li_b_m_t'>"
 										  +"<div class='t_li_b_m_i'>"
-										  +"<img src='"+topic_info['tumb']+"'/></div>"
-										  +"<span><p>"+info[index].t_title+"</p></span></div>"
+										  +"<img src='"+info[index].tumb+"'/></div>"
+										  +"<span><a href='topic.php?topic="+info[index].topic_id+"'><p>"+info[index].t_title+"</p></a></span></div>"
 										  +"<div class='t_li_b_m_c'>"
-										  +"<p>"+info[index].topic.replace(/\\"/g,'\\\\"')+"</p></div></div>";
-										  
+										  +"<p>"+info[index].topic.replace(/\\"/g,'\\\\"')+"</p></div>";
+							
+							var res=info[index].responses;
+							if(res[0]){
+								append_div1 +="<div class='t_li_b_m_r'><ul>";
+								$.each(res,function(index,val){
+									
+										append_div1 +="<li id='res_id_"+res[index].RES_ID+"'>"
+													+"<span><p>"+res[index].name+"</p></span>"
+													+"<div class='t_li_h_t'><input type='hidden' value='' id='del_res_flag'> <p>"+res[index].res_time+"</p></div><br/>"
+													+"<div class='t_li_b_m_r_m'>"
+													+"<span><img src='"+res[index].tumb+"'/></span></div>"
+													+"<div class='t_li_b_m_r_t'><p>"+res[index].res_content+"</p></div></li>";
+													
+														
+									});
+								append_div1+="</ul></div>";
+							}
+							append_div1+="</div>";
 							append_div1	+="<div class='t_li_b_m_f'>"
 										  +"<div class='t_li_b_m_f_i'>"
 										  +"<span><img id='"+liked_id+"' onClick='likes()' src='"+liked+"'></span></div>"
 										  +"<div class='t_li_b_m_f_l'>"
 										  +"<div class='t_li_b_m_f_li' onClick='show_likers()'><p>"+info[index].likes+"</p><span>likes</span></div>"
 										  +"<div class='t_li_b_m_f_di' onClick='show_dislikers()'><p>"+info[index].dislikes+"</p><span>dislikes</span></div></div>";
+									
 							if(info[index].auth){		  
 								append_div1	+="<div class='t_li_b_m_f_r' onClick='response_to_topic()'><p>Respond</p></div>"
 											  +"<div class='t_li_b_m_f_o' onClick='show_options()'><p>options</p></div>"
@@ -264,15 +285,12 @@ function topics_list(configaration){
 											  +"</div></div></li>";
 								}
 										  topic_id='#t_id_'+info[index].topic_id;
-										  show_responses(topic_id);
+										 
 						});
 						
 						$(append_div1).appendTo(".topics_list_main");
 						
 						
-					});
-						
-							
 					}
 					}
 				},
@@ -327,7 +345,7 @@ function liked(like_temp,t_id,fn){
 	t_id=t_id.split("_").pop();
 	if(t_id){
 		$.ajax({
-			url:'likes.php',
+			url:'forum_add.php',
 			method:"post",
 			dataType:"text",
 			data:{
@@ -352,7 +370,7 @@ function show_likers(){
 				t_id1=t_id.split("_").pop();
 				
 				$.ajax({
-				url:'likes.php',
+				url:'infogiver.php',
 				method:"post",
 				dataType:"text",
 				data:{
@@ -391,7 +409,7 @@ function show_dislikers(){
 				t_id1=t_id.split("_").pop();
 				
 				$.ajax({
-				url:'likes.php',
+				url:'infogiver.php',
 				method:"post",
 				dataType:"text",
 				data:{
@@ -424,11 +442,11 @@ function show_dislikers(){
 		});
 	}
 function close_likers_list(){
-	$(document).on("click",".likers_list_outer span,#splash",function(){
+	
 		
 		$(".likers_list_outer").remove();
 		$("#splash").click();
-		});
+		
 	}
 function response_to_topic(){
 	$(".topics_list_outer").one("click",".t_li_b_m_f_r",function(){
@@ -490,7 +508,8 @@ function submit_response(){
 	}
 function show_responses(t_id){
 	var t_id1=t_id.split("_").pop();
-
+	var count_res_start=-10;
+	var count_res_end=0;
 	$(t_id).find(".r_text_outer").remove();
 	if($(t_id).find(".t_li_b_m_r").length == 0){
 			$.ajax({
@@ -499,7 +518,9 @@ function show_responses(t_id){
 					dataType:"text",
 					data:{
 						flag:"show_responses",
-						topic_id:t_id1
+						topic_id:t_id1,
+						count_res_start:count_res_start,
+						count_res_end:count_res_end
 						},
 					success:function(data){
 						if(data){
@@ -701,12 +722,7 @@ function done_edit(){
 			}
 		});
 	}
-function no_tumb(){
-	
-	$(function(){
-	$(".grad_pics,#cover_pic_main").hide();
-	$("#cover_pic").prepend("<div id='no_tumb_main'></div>");
-	});}
+
 	
 function makeNewPosition(){
     
@@ -778,35 +794,13 @@ $(function(){
 	var configaration={
 						'ID':false,
 						'room':false,
-						
+						'start':-5,
+						'end':1
 						};
 	topics_list(configaration);
-	
-	
-	
-	$(".options_icon_gif").click(function(){
-			var flag=$("#hide").css("display");
-			if(flag=="none"){
-			$(this).css({'transform':'rotate(90deg)'});
-			$("#hide").show(200);
-			$("#hide1").show(200);
-			}
-			else{
-				$(this).css({'transform':'rotate(180deg)'});
-			$("#hide").hide(200);
-			$("#hide1").hide(200);
-				}
-			});
-		
 	var expand;
 	var expand_id;
-	$(".search_icon_gif").on("click",function(){
-		$(".searchbox_outer").fadeIn().show();
-		$("#searchbox").focus();
-		});
-	$("#close_icon_gif_id").on("click",function(){
-		$(".searchbox_outer").fadeOut();hide();
-		});
+	
 			
 	$(".room_name").hover(function(){
 		$(this).append("<h4 class='tap_txt'>Tap to expand.</h4>");

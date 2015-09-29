@@ -1,6 +1,6 @@
 <?PHP
-include("secure_session.php");
-sec_session_start();
+	include("secure_session.php");
+	sec_session_start();
 ?>
 <!doctype html>
 <html>
@@ -35,7 +35,8 @@ sec_session_start();
                         var info=JSON.parse(data);
                         
                             if(info){
-                                var append_div="<div class='corner_include' id='c_id_"+corner_id+"'><p>"+info[0].corner_name+"</p><img src='../../mydata/pics/close.gif'/></div>";
+                                var append_div="<div class='corner_include' id='corner_"+corner_id+"'><p>"+info[0].corner_name+"</p><img src='../../mydata/pics/close.gif'/></div>";
+								$("#start_topic").find("select[name='topic_corner']").hide();
                                 $(".corner_inclusion").fadeIn().prepend(append_div);
                             }
                         },
@@ -45,12 +46,66 @@ sec_session_start();
                     });
                 }
             }
-            
+            function include_corner(){
+				$.ajax({
+					url:"infogiver.php",
+					dataType:"json",
+					method:"post",
+					data:{
+						flag:"admin_corner",
+						mem_ID:true
+						},
+					success: function(data){
+						if(data == "notfound"){
+							alert("Oops! Something went wrong");
+							}
+						else if(data !=""){
+							corners_info(data,function(info){
+								var append_div=''; 
+								if(info){
+									$.each(info,function(index,val){
+										append_div+="<option value='corner_"+parseInt(info[index].corner_id)+"'>"+info[index].corner_name+"</option>"
+										});
+									$(".start_section select[name='topic_corner']").append(append_div);
+									$(".start_section select[name='poll_corner']").append(append_div);
+									}
+								});
+							}
+							else {
+									$("#start_topic select[name='topic_corner']").remove();
+									var append="<p class='notify_gray'>You haven't started any corners yet.</p>";
+									$("#start_topic #field4 .st_t_i").append(append);
+									}
+						
+						},
+					error:function(jXHR,textStatus,errorThrown){
+						alert(errorThrown);
+						}
+					});
+				}
+			function corners_info(corners_id,fn){
+				$.ajax({
+					url:"infogiver.php",
+					dataType:"text",
+					method:"post",
+					data:{
+						flag:"corner_info",
+						corner_id:corners_id
+						},
+					success:function(data){
+						var y=JSON.parse(data);
+						fn(y);
+						},
+					error:function(jXHR,textStatus,errorThrown){
+						alert(errorthrown);
+						}
+					});
+				}
             function f(){
                 section_name=$("#start_selection_form input[name=start_select]:checked").attr("id");
                 section_name="#"+section_name.replace("radio","start"); 
                 $(".start_section").hide();
-                showby_anim(section_name);
+				showby_anim(section_name);
             }
             function showby_anim(section_name){
                 $(section_name).find(".st_t_main").children().each(function(index,element){
@@ -103,7 +158,26 @@ sec_session_start();
             function auto_complete(settings){
                 alert(settings);
                 
-                }	
+                }
+			function st_topic(){
+				$(".start_section").hide();
+				showby_anim("#start_topic");
+				$(".start_inner").css({'width':'942'}).find("#field1 .st_t_title p").html("Title of the topic");;
+				$("#start_topic textarea[name='topic_content']").css({'width':'500','height':'50'});
+				}
+			function st_article(){
+				$(".start_section").hide();
+				$("#start_topic").show();
+				$(".start_inner").css({'width':'100%'}).find("#field1 .st_t_title p").html("Title of the article");
+				$("#start_topic textarea[name='topic_content']").css({'width':'700px','height':'200px'});
+				}
+			function st_poll(){
+				$(".start_section").hide();
+				showby_anim("#start_poll");
+				$(".start_inner").css({'width':'942'}).find("#field1 .st_t_main");
+				$("#start_topic textarea[name='topic_content']").css({'width':'500','height':'50'});
+				}
+			
             $(function(){
                 
                 
@@ -138,23 +212,14 @@ sec_session_start();
                 
                 
         
-            $(".options_icon_gif").click(function(){
-                var flag_d=$("#hide").css("display");
-                if(flag_d=="none"){
-                $(this).css({'transform':'rotate(90deg)'});
-                $("#hide").show(200);
-                $("#hide1").show(200);
-                }
-                else{
-                    $(this).css({'transform':'rotate(180deg)'});
-                $("#hide").hide(200);
-                $("#hide1").hide(200);
-                    }
-                });
+            
             });
         var expand;
         var expand_id;
         $(function(){
+			
+			include_corner();
+			
             $(".search_icon_gif").on("click",function(){
                 $(".searchbox_outer").fadeIn().show();
                 $(".searchbox_top").focus();
@@ -227,16 +292,24 @@ sec_session_start();
             });
         $("div").on("click",".corner_include img",function(){
                 $(".corner_include").fadeOut().remove();
+				$("select[name='topic_corner'").fadeIn();
             });
             
             //------------forum add functions
-            
+          
             $("div #start_topic .footer_field").on("click",".button",function(){
                 var t_title=$("#field1 .st_textbox").val();
                 var t_content=$("#field2 .st_textarea").val();
                 var t_room=$("input[name='room_select']:checked").attr("id");
                 var t_pic=$("#start_topic #uploadpic").val();
-                var t_corner=$("#field4 .st_textbox").val();
+                var topic_type=$("input[name=topic_select]:checked").attr("id");
+				var temp="Give some title to your topic."
+				var temp1="Give some content to your topic."
+				if(topic_type=="topic_article") {
+					
+					temp="Give some title to your article."
+					temp1="Give some content to your article."	
+					}
                 flag=0;
                 
                 if(t_pic!=0){
@@ -252,7 +325,7 @@ sec_session_start();
                     }
                 }
                 if(t_title==0){
-                    $("#field1 .st_t_info p").css({"color":"red","margin-left":-5}).html("Give some title to your topic.").animate({'margin-left':0});
+                    $("#field1 .st_t_info p").css({"color":"red","margin-left":-5}).html(temp).animate({'margin-left':0});
                     flag=1;
                      prevent("#topic");
                     }
@@ -262,7 +335,7 @@ sec_session_start();
                     flag=1;
                     if($("#field2 .st_t_info p").length==0){
                         $("#field2").append("<div class='st_t_info'><p></p></div>");
-                        $("#field2 .st_t_info p").css({"color":"red","margin-left":-5}).html("Give some content to your topic.").animate({'margin-left':0});
+                        $("#field2 .st_t_info p").css({"color":"red","margin-left":-5}).html(temp1).animate({'margin-left':0});
                     
                     prevent("#topic");
                     }
@@ -272,12 +345,15 @@ sec_session_start();
                  $("#topic").on('submit', function(e) { 
                     e.preventDefault(); 
                     var formData = new FormData($(this)[0]);
-                    var corner_id=0;
+          		
                     if($(".corner_include").length){
-                        var temp=$(".corner_include").attr("id");
-                        corner_id=temp.split("_").pop();
+                        var t_corner=$(".corner_include").attr("id");
+                       
                         }
-                  formData.append('topic_corner',parseInt(corner_id));
+					
+					formData.append('topic_type',topic_type);
+					 formData.append('topic_corner',t_corner);
+                  formData.append('topic_corner_origin',t_corner);
                     formData.append('topic_room',t_room);
                 $(document).ajaxStart(function(){
                     if($("#start_topic .loading_pic").length==0){
@@ -490,21 +566,7 @@ sec_session_start();
              else{
                  header("location:loginPage.php");
              }
-             $flag_tumb="";
-                 $stmt_tumb_updater=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$u_ID");
-                     if($stmt_tumb_updater){
-                         $stmt_tumb_updater->execute();
-                         $stmt_tumb_updater->store_result();
-                         $stmt_tumb_updater->bind_result($flag_tumb);
-                         $stmt_tumb_updater->fetch();
-                         
-                         }
-                         if($flag_tumb=="0"){
-                            $flag_tumb="../../mydata/pics/unknownuser.jpg"; 
-                             }
-                              $flag_options="0";
-        
-                         if($u_ID){
+         	 if($u_ID){
                  $flag_options="logged";
                  } 
                  //-----------forum add functions
@@ -563,9 +625,7 @@ sec_session_start();
                                 <li class='navbar_list' id='quick_acces_icon_o'>
                                     	<img id='quick_acces_icon' src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
                                 </li>
-                                <li class="navbar_list" id="avatar_navbar_list">
-                                    <a href="profile.php"><img id="avatar_navbar" src="<?PHP echo $flag_tumb; ?>"></a>
-                                </li>
+                                
                                 
                             </ul>
                         </div>
@@ -633,10 +693,11 @@ sec_session_start();
                     <div class="start_list">
                         <form id="start_selection_form">
                           <input type="radio"  name="start_select" id="radio_topic" /><label class="start_label" for="radio_topic"><h3>Start Topic</h3></label>
-                           <input type="radio" name="start_select"  id="radio_group" /><label class="start_label" for="radio_group"><h3>Start Group</a></h3></label>
+                           <input type="radio" name="start_select"  id="radio_group" /><label class="start_label" for="radio_group"><h3>Start Group</h3></label>
                            <input type="radio"  name="start_select"  id="radio_corner" /><label class="start_label" for="radio_corner"><h3>Start Corner</h3></label>
                         </form>
                     </div>
+                   
                    <div id="rooms">
                          <div class="st_t_i" id="room_select_div">
                                  <form id="room_selection_form">
@@ -649,9 +710,19 @@ sec_session_start();
                                </div>
                             </div>
                     <section class="start_section" id="start_topic">
-                    
+                    		
+                        <div class='start_other_outer'>
+                            <div class='start_other_inner'>
+                                  <form id="topic_selection_form">
+                                        <input type="radio" name="topic_select"  id="topic_topic" checked/><label class="room_label" for="topic_topic"><span onClick="st_topic();">Topic</span></label>
+                                        <input type="radio" name="topic_select"  id="topic_article" /><label class="room_label" for="topic_article"><span onClick="st_article();">Article</span></label>
+                                        <input type="radio" name="topic_select"  id="topic_poll" /><label class="room_label" for="topic_poll"><span onClick="st_poll();">Poll</span></label>
+                                     
+                                 </form>
+                        	</div>
+                   	    </div>
                         <div class="st_t_main">
-                            
+                             
                             <div class="field" id="field1">
                                 <div class="st_t_title"><p>Title of the topic</p></div>
                                 <div class="st_t_s"><p>:</p></div>
@@ -689,7 +760,9 @@ sec_session_start();
                                 <div class="st_t_title"><p>Include in</p></div>
                                 <div class="st_t_s"><p>:</p></div>
                                  <div class="st_t_i">
-                                    <input type="text" name="topic_corner"  class='st_textbox' maxlength="100" />
+                                    <select  name="topic_corner" class='st_textbox' maxlength="100">
+                                    	<option value=""></option>
+                                    </select>
                                  </div>
                                  <div class="corner_inclusion"></div>
                         </div>
@@ -697,6 +770,62 @@ sec_session_start();
                             
                             <button class="button" >Done</button>
                             </form>
+                        </div>
+                        <div>
+                        	
+                        </div>
+                        </section>
+                       <section class="start_section" id="start_poll">
+                        <div class='start_other_outer'>
+                            <div class='start_other_inner'>
+                                  <form id="topic_selection_form">
+                                        <input type="radio" name="topic_select"  id="topic_topic"/><label class="room_label" for="topic_topic"><span onClick="st_topic();">Topic</span></label>
+                                        <input type="radio" name="topic_select"  id="topic_article" /><label class="room_label" for="topic_article"><span onClick="st_article();">Article</span></label>
+                                        <input type="radio" name="topic_select"  id="topic_poll" checked /><label class="room_label" for="topic_poll"><span onClick="st_poll();">Poll</span></label>
+                                     
+                                 </form>
+                        	</div>
+                   	    </div>
+                        <div class="st_t_main">
+                             
+                            <div class="field" id="field1p">
+                                <div class="st_t_title"><p>Title of the poll</p></div>
+                                <div class="st_t_s"><p>:</p></div>
+                                <div class="st_t_i">
+                                <form action="" method="post" name="poll" id="poll"  enctype="multipart/form-data">
+                                    <input type="text" name="poll_title" class='st_textbox' maxlength="100" />
+                               </div>
+                               <br/>
+                               <div class="st_t_info" ><p>Maximum 100 letters.</p></div>
+                               
+                            </div>
+                            <div  class="field" id="field2p">
+                                <div class="st_t_title"><p>Content</p></div>
+                                <div class="st_t_s"><p>:</p></div>
+                                <div class="st_t_i">
+                                    <input type="text" name="poll_part" class='st_textbox' maxlength="100" />
+                               </div>
+                                 <br/>
+                            </div>
+                            
+                                  
+                        <div  class="field" id="field4p">
+                                <div class="st_t_title"><p>Include in</p></div>
+                                <div class="st_t_s"><p>:</p></div>
+                                 <div class="st_t_i">
+                                    <select  name="poll_corner" class='st_textbox' maxlength="100">
+                                    	<option value=""></option>
+                                    </select>
+                                 </div>
+                                 <div class="corner_inclusion"></div>
+                        </div>
+                        <div class="footer_field">
+                            
+                            <button class="button">Done</button>
+                            </form>
+                        </div>
+                        <div>
+                        	
                         </div>
                     </section>
                     <section class="start_section" id="start_group">

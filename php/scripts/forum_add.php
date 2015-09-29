@@ -22,6 +22,13 @@ function fillKeys($keys, $value) {
     }
     return $return;
 }
+function delTree($dir) { 
+   $files = array_diff(scandir($dir), array('.','..')); 
+    foreach ($files as $file) { 
+      (is_dir("$dir/$file")) ? delTree("$dir/$file") : unlink("$dir/$file"); 
+    } 
+    return rmdir($dir); 
+  } 
  if(isset($_SESSION['u_ID'],$_SESSION['u_name'],$_SESSION['u_email'], $_SESSION['xploded_u_email'], $_SESSION['login_string'])) {
      $U_ID = $_SESSION['u_ID'];
 	 $xploded_u_email=$_SESSION['xploded_u_email'];
@@ -33,8 +40,129 @@ function fillKeys($keys, $value) {
 	
 	$cres_array=array("CRES_ID"=>'',"RES_ID"=>'',"TOPIC_ID"=>'',"U_ID"=>'',"cres_content"=>'',"cres_time"=>'');
 	$res_array=array("RES_ID"=>'',"TOPIC_ID"=>'',"U_ID"=>'',"res_content"=>'',"res_time"=>'',"cres"=>array());
-	$topic_array=array("TOPIC_ID"=>'',"U_ID"=>'',"ROOM_ID"=>'',"CORNER_ID"=>'', "topic_title"=>'', "topic_content"=>'', "topic_pic"=>'',"topic_time"=>'',"likers"=>array(),"dislikers"=>array(),"res_array"=>array());
+	$topic_array=array("TOPIC_ID"=>'',"U_ID"=>'',"ROOM_ID"=>'',"CORNER_ID"=>'', "topic_type"=>'', "topic_title"=>'', "topic_content"=>'', "topic_pic"=>'',"topic_time"=>'',"likers"=>array(),"dislikers"=>array(),"res_array"=>array());
 	
+	
+	
+	//-----scriptLikers
+	
+	if(isset($_POST['flag'], $_POST['like_temp'] , $_POST['topic_id']) && ($_POST['flag']=='like')){
+		$like_temp=$_POST['like_temp'];
+		$topic_id=$_POST['topic_id'];
+		$likes=$likers=$dislikers=0;
+		$likers_temp1=$dislikers_temp1=NULL;
+		
+		if($stmt0=$mysqli->prepare("SELECT `TOPIC_ID`, `ID`, `ROOM_ID`, `CORNER_ID`, `topic_type`, `topictitle` from `fireconverse`.`topics` where `TOPIC_ID` ='".$topic_id."'")){
+			$stmt0->execute();
+			$stmt0->store_result();
+			$stmt0->bind_result($topic_id,$mem_id,$room_id,$corner_id,$topic_type,$topic_title);
+			if($stmt0->fetch()){
+				$filename="../../data/userprofile/topics/".$mem_id."/".$topic_id."/".$mem_id."_".$room_id."_".$corner_id."_".$topic_id.".txt";
+				if(file_exists($filename)){
+					$topic_array_file=json_decode(file_get_contents($filename),true);
+					$likers=$topic_array_file['likers'];
+					$dislikers=$topic_array_file['dislikers'];
+					}
+				}
+		
+		function update_likers($likers_temp1,$dislikers_temp1){
+				global $topic_array_file,$filename; 
+				
+				$topic_array_file['likers']=$likers_temp1;
+				$topic_array_file['dislikers']=$dislikers_temp1;
+				if(file_put_contents($filename,json_encode($topic_array_file))) return true;
+				else return false;
+					}
+				if($like_temp=='1'){
+					if($likers){
+						if(in_array($U_ID,$likers)){
+							exit();
+							}
+						else{
+							array_push($likers,$U_ID);
+						    }
+						  }
+						else{
+							$likers==array();
+							array_push($likers,$U_ID);
+							
+							
+							}
+						if($dislikers){
+						
+							if(in_array($U_ID,$dislikers)){
+								$key=array_search($U_ID,$dislikers);
+								unset($dislikers[$key]);
+								
+								}
+						 }
+							
+						if(update_likers($likers,$dislikers)){ 
+							echo "updated_liked";
+							}
+						}
+					
+				if($like_temp == '-1'){
+					if($dislikers){
+						
+							if(in_array($U_ID,$dislikers)){
+								exit();
+								}
+							else{
+								array_push($dislikers,$U_ID);
+						    	}
+						}
+					else{
+						$dislikers_=array ();
+						array_push($dislikers,$U_ID);
+						
+						}
+					if($likers){
+							
+							if(in_array($U_ID,$likers)){
+								$key=array_search($U_ID,$likers);
+								unset($likers[$key]);
+								}
+						 }
+							
+						if(update_likers($likers,$dislikers)){
+							echo 'updated_disliked';
+							}
+					
+					}
+				
+				if($like_temp=='9'){
+					
+					if($likers){
+						
+							if(in_array($U_ID,$likers)){
+								$key=array_search($U_ID,$likers);
+								unset($likers_[$key]);
+								
+								}
+						}
+					if($dislikers){
+						
+							if(in_array($U_ID,$dislikers)){
+								$key=array_search($U_ID,$dislikers);
+								unset($dislikers[$key]);
+								
+								}
+						}
+					if(update_likers($likers,$dislikers)){
+							echo 'updated_like';
+							}
+					
+					}
+				
+			
+			}
+	
+
+		}
+	
+	
+
 if(isset($_POST['flag']) && ($_POST['flag']=='add_response') && isset($_POST['topic_id'], $_POST['response_text'])){
 	$json='[';
 	$error=$tumb='';
@@ -43,29 +171,30 @@ if(isset($_POST['flag']) && ($_POST['flag']=='add_response') && isset($_POST['to
 	$time=time();
 	$response_text=htmlspecialchars($response_text);
 	$response_text=preg_replace("/\s+/", " ",nl2br($response_text));
-	if($stmt0=$mysqli->prepare("select * from `fireconverse`.`topics` where `TOPIC_ID` ='".$topic_id."'") && $stmt0->execute()){
+	if($stmt0=$mysqli->prepare("SELECT `TOPIC_ID`, `ID`, `ROOM_ID`, `CORNER_ID`, `topic_type`, `topictitle` from `fireconverse`.`topics` where `TOPIC_ID` ='".$topic_id."'")){
+		$stmt0->execute();
 		$stmt0->store_result();
-		$stmt0->bind_result($topic_id,$mem_id,$room_id,$corner_id,$topic_title,$date);
+		$stmt0->bind_result($topic_id,$mem_id,$room_id,$corner_id,$topic_type,$topic_title);
 		if($stmt0->fetch()){
 			$filename="../../data/userprofile/topics/".$mem_id."/".$topic_id."/".$mem_id."_".$room_id."_".$corner_id."_".$topic_id.".txt";
 			if(file_exists($filename)){
-				$topic_array_file=json_decode(file_get_contents($filename));
-				if($topic_array_file['res_array']=''){
+				$topic_array_file=json_decode(file_get_contents($filename),true);
+				if($topic_array_file['res_array'] == ''){
 					$res_id_count=1;
 					}
 				else{
 					$res_end=end($topic_array_file['res_array']);
-					$res_id_count=$res_end['TOPIC_ID']+1;
+					$res_id_count=$res_end['RES_ID']+1;
 					}
 				fillKeys($res_array,'');
 				$res_array['RES_ID']=$res_id_count;
 				$res_array['TOPIC_ID']=$topic_id;
-				$res_array['U_ID']=$mem_ID;
+				$res_array['U_ID']=$U_ID;
 				$res_array['res_content']=$response_text;
-				$res_array['res_time']=$time();
+				$res_array['res_time']=time();
 				array_push($topic_array_file['res_array'],$res_array);
 				if(file_put_contents($filename,json_encode($topic_array_file))){
-					$stmt_tumb=$mysqli_memdata->prepare("SELECT `name` FROM `fireconverse`.`members` WHERE `ID`=$mem_ID");
+					$stmt_tumb=$mysqli->prepare("SELECT `name` FROM `fireconverse`.`members` WHERE `ID`=$U_ID");
 					 if($stmt_tumb){
 						 $stmt_tumb->execute();
 						 $stmt_tumb->store_result();
@@ -73,7 +202,7 @@ if(isset($_POST['flag']) && ($_POST['flag']=='add_response') && isset($_POST['to
 						 $stmt_tumb->fetch();
 						 }
 					$stmt_tumb->close();
-					$stmt_tumb=$mysqli_memdata->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$mem_ID");
+					$stmt_tumb=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$U_ID");
 					 if($stmt_tumb){
 						 $stmt_tumb->execute();
 						 $stmt_tumb->store_result();
@@ -85,7 +214,7 @@ if(isset($_POST['flag']) && ($_POST['flag']=='add_response') && isset($_POST['to
 							 }
 						$date=date("j \of F Y",$time);
 						$json.='{"res_id":"'.$res_id_count.'",';
-						$json.='"ID":"'.$mem_ID.'",';
+						$json.='"ID":"'.$U_ID.'",';
 						$json.='"mem_name":"'.$mem_name.'",';
 						$json.='"mem_tumb":"'.$tumb.'",';
 						$json.='"topic_id":"'.$topic_id.'",';
@@ -111,19 +240,19 @@ if( isset($_POST['flag'],$_POST['topic_id'], $_POST['edit'],$_POST['edit1']) && 
 	$topic_id=$_POST['topic_id'];
 	$edit=$_POST['edit'];
 	$edit1=$_POST['edit1'];
-	$topic_t_edit=htmlspecialchars($response_text);
-	$topic_t_edit=preg_replace("/\s+/", " ",nl2br($response_text));
-	$topic_cont_edit=htmlspecialchars($response_text);
-	$topic_cont_edit=preg_replace("/\s+/", " ",nl2br($response_text));
-	if($stmt0=$mysqli->prepare("select * from `fireconverse`.`topics` where `TOPIC_ID` ='".$topic_id."'") && $stmt0->execute()){
+	$topic_t_edit=htmlspecialchars($edit1);
+	$topic_t_edit=preg_replace("/\s+/", " ",nl2br($topic_t_edit));
+	$topic_cont_edit=htmlspecialchars($edit);
+	$topic_cont_edit=preg_replace("/\s+/", " ",nl2br($topic_cont_edit));
+	if(($stmt0=$mysqli->prepare("SELECT `TOPIC_ID`, `ID`, `ROOM_ID`, `CORNER_ID`, `topic_type`, `topictitle` from `fireconverse`.`topics` where `TOPIC_ID` ='".$topic_id."'")) && $stmt0->execute()){
 		$stmt0->store_result();
-		$stmt0->bind_result($topic_id,$mem_id,$room_id,$corner_id,$topic_title,$date);
+		$stmt0->bind_result($topic_id,$mem_id,$room_id,$corner_id,$topic_type,$topic_title);
 		if($stmt0->fetch()){
 			$filename="../../data/userprofile/topics/".$mem_id."/".$topic_id."/".$mem_id."_".$room_id."_".$corner_id."_".$topic_id.".txt";
 			if(file_exists($filename)){
-				$topic_array_file=json_decode(file_get_contents($filename));
-				$topic_array_file['topic_title']=$edit;
-				$topic_array_file['topic_content']=$edit1;
+				$topic_array_file=json_decode(file_get_contents($filename),true);
+				$topic_array_file['topic_title']=$topic_t_edit;
+				$topic_array_file['topic_content']=$topic_cont_edit;
 				if(file_put_contents($filename,json_encode($topic_array_file)))
 					echo "updated";
 				}
@@ -136,22 +265,24 @@ if( isset($_POST['flag'],$_POST['topic_id'], $_POST['edit'],$_POST['edit1']) && 
 	}
 if( isset($_POST['flag'],$_POST['topic_id']) && ($_POST['flag']=='delete_topic')){
 	$topic_id=$_POST['topic_id'];
-	if($stmt0=$mysqli->prepare("select * from `fireconverse`.`topics` where `TOPIC_ID` ='".$topic_id."'") && $stmt0->execute()){
+	if(($stmt0=$mysqli->prepare("SELECT `TOPIC_ID`, `ID`, `ROOM_ID`, `CORNER_ID`,`topictitle`, `date_of_topic` from `fireconverse`.`topics` where `TOPIC_ID` ='".$topic_id."'")) && $stmt0->execute()){
 		$stmt0->store_result();
-		$stmt0->bind_result($topic_id,$mem_id,$room_id,$corner_id,$topic_title,$date);
+		$stmt0->bind_result($topic_id,$mem_id,$room_id,$corner_id,$topic_title,$t_date);
 		if($stmt0->fetch()){
 			$filename="../../data/userprofile/topics/".$mem_id."/".$topic_id."/".$mem_id."_".$room_id."_".$corner_id."_".$topic_id.".txt";
 			if(file_exists($filename)){
-				$topic_array_file=json_decode(file_get_contents($filename));
+				$topic_array_file=json_decode(file_get_contents($filename),true);
 				$corner_id=$topic_array_file['CORNER_ID'];
 				$MEM_ID=$topic_array_file['U_ID'];
-				unlink("../../data/userprofile/topics/".$mem_id."/".$topic_id);
-				if(($stmt=$mysqli->prepare("select `topics` from `fireconverse`.`meminfo` where `ID`='".$MEM_ID."' LIMIT 1")) && ($stmt->execute())){
+				$dir="../../data/userprofile/topics/".$mem_id."/".$topic_id;
+				delTree($dir);
+				if(($stmt=$mysqli->prepare("select `topics` from `fireconverse`.`meminfo` where `ID`='".$U_ID."' LIMIT 1")) && ($stmt->execute())){
 					$stmt->store-result();
 					$stmt->bind_result($topics_list);
 					$stmt->fetch();
 					$topics_list_array=unserialize($topic_list);
-					if (($key = array_search($topic_id, $topics_list_array)) !== false) {
+					$key = array_search($topic_id, $topics_list_array);
+					if ($key != false) {
 						unset($topics_list_array[$key]);
 						}
 					$topic_list_new=serialize($topics_list_array);
@@ -188,7 +319,12 @@ if(isset($_POST['topic_title'],$_POST['topic_content'],$_FILES['topic_pic'],$_PO
 	$t_title=$_POST['topic_title'];
 	$t_content=$_POST['topic_content'];
 	$t_corner=$_POST['topic_corner'];
+	if($t_corner=="") $t_corner=$_POST['topic_corner_origin'];
+	$t_corner=intval(str_replace("corner_","",$t_corner));
 	$t_room=$_POST['topic_room']; 
+	$topic_type=$_POST['topic_type'];
+	$topic_type_int=0;
+	if($topic_type=='topic_article') $topic_type_int=1;
 	$room_id=1;
 	switch($t_room){
 		case "room_sports":
@@ -216,12 +352,11 @@ if(isset($_POST['topic_title'],$_POST['topic_content'],$_FILES['topic_pic'],$_PO
 	$t_content=preg_replace("/\s+/", " ",nl2br($t_content));
 	
 
-
-	if($stmt=$mysqli->prepare("insert into `fireconverse`.`topics` (ID, ROOM_ID, CORNER_ID, topictitle,date_of_topic) values(?,?,?,?,?)")){
+	if($stmt=$mysqli->prepare("insert into `fireconverse`.`topics` (ID, ROOM_ID, CORNER_ID,topic_type, topictitle,date_of_topic) values(?,?,?,?,?,?)")){
 		
-		$stmt->bind_param('iiisi',$U_ID,$room_id,$t_corner,$t_title,$time);
+		$stmt->bind_param('iiiisi',$U_ID,$room_id,$t_corner,$topic_type_int,$t_title,$time);
 		if($stmt->execute()){ 
-			$id = mysqli_insert_id($mysqli);
+			$id = mysqli_insert_id($mysqli); 
 			if($id){ 
 				$error="";
 				$target='../../data/userprofile/topics/'.$U_ID.'/'; 
@@ -233,6 +368,7 @@ if(isset($_POST['topic_title'],$_POST['topic_content'],$_FILES['topic_pic'],$_PO
 				$topic_array['U_ID']=$U_ID;
 				$topic_array['ROOM_ID']=$room_id;
 				$topic_array['CORNER_ID']=$t_corner;
+				$topic_array['topic_type']=$topic_type;
 				$topic_array['topic_title']=$t_title;
 				$topic_array['topic_content']=$t_content;
 				$topic_array['topic_time']=$time;
@@ -272,12 +408,13 @@ if(isset($_POST['topic_title'],$_POST['topic_content'],$_FILES['topic_pic'],$_PO
 						$content=json_encode($topic_array);
 						file_put_contents($dirname1,$content);	
 							
-						$temp_array_temp=$topics_arraydb=array();
-						$stmt1=$mysqli->prepare("select `topics` from `fireconverse`.`meminfo` where `ID`='".$U_ID."'");
+						
+						if($topic_type=="topic_topic"){
+							$temp_array_temp=$topics_arraydb=array();
+							$stmt1=$mysqli->prepare("select `topics` from `fireconverse`.`meminfo` where `ID`='".$U_ID."'");
 							if($stmt1->execute()){
 								$stmt1->store_result();
 								$stmt1->bind_result($topic_array_temp);
-								
 								$stmt1->fetch();
 								if($temp_array_temp) $topics_arraydb=unserialize($topic_array_temp);
 								array_push($topics_arraydb,$id);
@@ -300,7 +437,7 @@ if(isset($_POST['topic_title'],$_POST['topic_content'],$_FILES['topic_pic'],$_PO
 										array_push($topics_arraydb,$id);
 										$topic_array_temp1=serialize($topics_arraydb);
 										$stmt1->close();
-										$stmt1=$mysqli->prepare("update `fireconverse`.`corner` set `topics`='".$topic_array_temp1."' where `ID`='".$t_corner."'");
+										$stmt1=$mysqli->prepare("update `fireconverse`.`corner` set `topics`='".$topic_array_temp1."' where `CORNER_ID`='".$t_corner."'");
 										if($stmt1->execute()) $error='updated'; 
 									}
 									else $error="top_sel_cor";
@@ -308,6 +445,46 @@ if(isset($_POST['topic_title'],$_POST['topic_content'],$_FILES['topic_pic'],$_PO
 							}
 							
 							
+						}
+						else if($topic_type=="topic_article"){
+							$temp_array_temp=$topics_arraydb=array();
+							$stmt1=$mysqli->prepare("select `articles` from `fireconverse`.`meminfo` where `ID`='".$U_ID."'");
+							if($stmt1->execute()){
+								$stmt1->store_result();
+								$stmt1->bind_result($topic_array_temp);
+								
+								$stmt1->fetch();
+								if($temp_array_temp) $topics_arraydb=unserialize($topic_array_temp);
+								array_push($topics_arraydb,$id);
+								$topic_array_temp1=serialize($topics_arraydb);
+								$stmt1->close();
+								
+								$stmt1=$mysqli->prepare("update `fireconverse`.`meminfo` set `articles`='".$topic_array_temp1."' where `ID`='".$U_ID."'");
+								if($stmt1->execute()) $error='updated'; 
+								else $error="top_up";
+									$stmt1->close();
+								if($t_corner){
+									$temp_array_temp=$topics_arraydb=array();
+									$stmt1=$mysqli->prepare("select `articles` from `fireconverse`.`corner` where `CORNER_ID`='".$t_corner."'");
+									if($stmt1->execute()){
+										$stmt1->store_result();
+										$stmt1->bind_result($topic_array_temp);
+										
+										$stmt1->fetch();
+										if($temp_array_temp) $topics_arraydb=unserialize($topic_array_temp);
+										array_push($topics_arraydb,$id);
+										$topic_array_temp1=serialize($topics_arraydb);
+										$stmt1->close();
+										$stmt1=$mysqli->prepare("update `fireconverse`.`corner` set `articles`='".$topic_array_temp1."' where `CORNER_ID`='".$t_corner."'");
+										if($stmt1->execute()) $error='updated'; 
+									}
+									else $error="top_sel_cor";
+								}
+							}
+							
+							
+						}
+						
 					}
 				unset($_POST['topic_title'],$_POST['topic_content'],$_POST['topic_pic'],$_POST['topic_corner'],$_POST['topic_room']);
 				

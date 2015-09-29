@@ -93,10 +93,7 @@
                                     <li class='navbar_list' id='quick_acces_icon_o'>
                                     	<img id='quick_acces_icon' src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
                                     </li>
-                                    <li class="navbar_list" id="avatar_navbar_list">
-                                        <a href="profile.php"><img id="avatar_navbar" src=""></a>
-                                    </li>
-                                    
+                                    	
                                 </ul>
                             </div>
                             

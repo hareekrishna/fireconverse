@@ -8,6 +8,7 @@ sec_session_start();
 <meta charset="utf-8">
 <title></title>
 <script src='../../js/jquery.min.js' ></script>
+ <script src="../../js/quick_access.js" ></script>
 <link rel="stylesheet" type="text/css" href="../../css/navbar.css" >
 <link rel="stylesheet" type="text/css" href="../../css/corner.css" >
 
@@ -103,6 +104,7 @@ function corner_info(){
 					$(".title_container h1").html(info[0].corner_name);
 					$(".status_text p").html(info[0].corner_desc);
 					$("#start_date .f_t_v").html(info[0].time);
+					room_nav_color(info[0].room_id);
 					
 				}
 			},
@@ -467,8 +469,23 @@ function submit_response(){
 						response_text:response_text
 						},
 					success:function(data){
-						if(data=="updated"){
-							show_responses(t_id);
+						var info=JSON.parse(data);
+						if(info){
+							$.each(info,function(index,val){
+									
+										append_div1 ="<li id='res_id_"+info[index].res_id+"'>"
+													+"<span><p>"+info[index].mem_name+"</p></span>"
+													+"<div class='t_li_h_t'><p>"+info[index].date_of_res+"</p></div><br/>"
+													+"<div class='t_li_b_m_r_m'>"
+													+"<span><img src='"+info[index].mem_tumb+"'/></span></div>"
+													+"<div class='t_li_b_m_r_t'><p>"+info[index].res_text+"</p></div></li>";
+													
+														
+									});
+									
+									
+								$(append_div1).appendTo($(t_id).find(".t_li_b_m ul"));
+								$(t_id).find(".r_text_outer").remove();
 							}
 						else{
 							alert("Oops!Something wrong might have occured!.Please try again.");
@@ -484,7 +501,8 @@ function submit_response(){
 	}
 function show_responses(t_id){
 	var t_id1=t_id.split("_").pop();
-
+	var count_res_start=-10;
+	var count_res_end=0;
 	$(t_id).find(".r_text_outer").remove();
 	if($(t_id).find(".t_li_b_m_r").length == 0){
 			$.ajax({
@@ -493,7 +511,9 @@ function show_responses(t_id){
 					dataType:"text",
 					data:{
 						flag:"show_responses",
-						topic_id:t_id1
+						topic_id:t_id1,
+						count_res_start:count_res_start,
+						count_res_end:count_res_end
 						},
 					success:function(data){
 						if(data){
@@ -502,10 +522,9 @@ function show_responses(t_id){
 							var append_div1; 
 							append_div1="<div class='t_li_b_m_r'><ul>";
 								$.each(info,function(index,val){
-									
-										append_div1 +="<li id='res_id_"+info[index].res_id+"'>"
+									append_div1 +="<li id='res_id_"+info[index].res_id+"'>"
 													+"<span><p>"+info[index].mem_name+"</p></span>"
-													+"<div class='t_li_b_m_r_d'><p>"+info[index].date_of_res+"</p></div><br/>"
+													+"<div class='t_li_h_t'><input type='hidden' value='' id='del_res_flag'> <p>"+info[index].date_of_res+"</p></div><br/>"
 													+"<div class='t_li_b_m_r_m'>"
 													+"<span><img src='"+info[index].mem_tumb+"'/></span></div>"
 													+"<div class='t_li_b_m_r_t'><p>"+info[index].res_text+"</p></div></li>";
@@ -565,6 +584,12 @@ $(function(){
 		$("#hide1").hide(200);
 			}
 		});
+	$(document).on("mouseenter",".topics_li li",function(){
+		$(this).find(".t_li_h_t").prepend("<img class='c_res_op' src='../../mydata/pics/counter_respond.png' /><img class='delete_op' src='../../mydata/pics/delete.png'>");
+			});
+		$(document).on("mouseleave",".topics_li li",function(){
+			$(this).find(".t_li_h_t .c_res_op,.t_li_h_t .delete_op").remove();
+			});
 	$("div .start_outer").one("click",".start_title p",function(){
 		$(".start_title p").css({"border-bottom":"1px solid #DADADA"});
 		$(".start_items").css({'margin-top':10,'display':'block'}).animate({'margin-top':0},500);
@@ -607,11 +632,7 @@ if(login_check($mysqli) == true) {
 				 $stmt_tumb_updater->fetch();
 				 
 				 }
-				 if($flag_tumb=="0"){
-					$flag_tumb="../../mydata/pics/unknownuser.jpg"; 
-					 }
-					  $flag_options="0";
-
+				 
 				 if($u_ID){
 		 $flag_options="logged";
 		
@@ -668,9 +689,7 @@ if(login_check($mysqli) == true) {
 							
 								}
 							?>
-                            <li class="navbar_list" id="avatar_navbar_list">
-                            	<a href="profile.php"><img id="avatar_navbar" src="<?PHP echo $flag_tumb; ?>"></a>
-                            </li>
+                           
                             
                         </ul>
                     </div>

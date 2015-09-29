@@ -98,27 +98,10 @@ if(isset($_POST['top'],$_POST['left'],$_POST['add'],$_POST['pic_width'],$_POST['
 					 $unlink=unlink($flag_tumb);
 					 }
 				 
-		   $stmt_tumb_update=$mysqli->prepare("UPDATE `fireconverse` SET `tumb_realavatar`='$filename' WHERE `ID`=$u_ID_avatar");
+		   $stmt_tumb_update=$mysqli->prepare("UPDATE `fireconverse` SET `tumb_realavatar`='".$filename."' WHERE `ID`=$u_ID_avatar");
 		   if($stmt_tumb_update){
 		  if( $stmt_tumb_update->execute()){
-			?>
-				<script type="text/javascript">
-                	var name="<?PHP echo $filename; ?>";
-					$(function(){
-					$.ajax({
-						
-						url:'ajaxcalls.php',
-						data:{ callflag:name},
-						dataType:"text",
-						type:'POST',
-						success: function(data){
-							$("#pic_selection_text").html("12");
-							}
-						});		
-					});
-									
-                 </script>
-            <?PHP
+			
 			  }
 		   
 		   }

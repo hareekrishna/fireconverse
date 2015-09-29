@@ -1,1 +1,0 @@
-{"TOPIC_ID":288,"U_ID":"150","ROOM_ID":1,"CORNER_ID":"0","topic_title":"pol","topic_content":"lipt","topic_pic":"..\/..\/data\/userprofile\/topics\/150\/288\/pic_150_1_0_288.jpg","topic_time":1441725148,"likers":[],"dislikers":[],"res_array":[]}

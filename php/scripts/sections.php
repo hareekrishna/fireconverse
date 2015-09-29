@@ -29,14 +29,7 @@
                 
              include("csign.php");
              
-             $stmt_tumb_updater=$mysqli->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$u_ID");
-                 if($stmt_tumb_updater){
-                     $stmt_tumb_updater->execute();
-                     $stmt_tumb_updater->store_result();
-                     $stmt_tumb_updater->bind_result($flag_tumb);
-                     $stmt_tumb_updater->fetch();
-                 }
-                
+            
                 
                 }
                 
@@ -44,9 +37,7 @@
          if($u_ID){
              $flag_options="logged";
              } 
-         if($flag_tumb=="0"){
-             $flag_tumb='../../mydata/pics/unknownuser.jpg'; 
-                     }
+        
     ?>
     <div class='page_body'>
         <div id="main_container_outer">
@@ -104,9 +95,7 @@
                                 <li class='navbar_list' id='quick_acces_icon_o'>
                                     	<img id='quick_acces_icon' src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
                                 </li>
-                                <li class="navbar_list" id="avatar_navbar_list">
-                                    <a href="profile.php"><img id="avatar_navbar" src="<?PHP echo $flag_tumb; ?>"></a>
-                                </li>
+                               
                                 
                             </ul>
                         </div>

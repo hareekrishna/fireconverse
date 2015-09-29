@@ -163,9 +163,7 @@
                              <li class='navbar_list' id='quick_acces_icon_o'>
                                     	<img id='quick_acces_icon' src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
                             </li>
-                            <li class="navbar_list" id="avatar_navbar_list">
-                            	<a href="profile.php"><img id="avatar_navbar" src=""></a>
-                            </li>
+                            
                             
                         </ul>
                     </div>
@@ -219,7 +217,7 @@
 	<div class="searchbox_outer">
                     	<div class="searchbox_inner">
                         	<div class="searchbox_main">
-                            	<input type="text" id="searchbox" name="searchbox" placeholder="Search.." >
+                            	<input type="text" class="searchbox_top" name="searchbox" placeholder="Search.." >
                                 <div class="search_icon">
                                 	<img src="../../mydata/pics/searc.gif" class="search_icon_gif1" id="search_icon_gif_id" >
                                     <img src="../../mydata/pics/close.gif" class="search_icon_gif1" id="close_icon_gif_id" >

@@ -31,7 +31,7 @@ function tumb(){
 			},
 		success: function(data){	
 			var f=JSON.parse(data);
-			$("#avatar_navbar").attr("src",f[0].tumb);
+			
 			$("#cover_pic_main").attr("src",f[0].wrapper);
 			$("#user_avatar,.tumb_outer img").attr("src",f[0].tumb);
 			$(".status_main,#layer1_field4 .l1_f_v").append(f[0].status);
@@ -74,37 +74,11 @@ $(function(){
 	sign();
 	tumb();
 	fonts_loader();
-	$(".options_icon_gif").click(function(){
-		var flag=$("#hide").css("display");
-		if(flag=="none"){
-		$(this).css({'transform':'rotate(90deg)'});
-		$("#hide").show(200);
-		$("#hide1").show(200);
-		}
-		else{
-			$(this).css({'transform':'rotate(180deg)'});
-		$("#hide").hide(200);
-		$("#hide1").hide(200);
-			}
-		});
-	});
-var expand;
-var expand_id;
-$(function(){
-	$(".search_icon_gif").on("click",function(){
-		$(".searchbox_outer").fadeIn().show();
-		$("#searchbox").focus();
-		});
-		$("#close_icon_gif_id").on("click",function(){
-		$(".searchbox_outer").fadeOut();hide();
-			});
-		
-		$(".room_name").hover(function(){
-		$(this).append("<h4 class='tap_txt'>Tap to expand.</h4>");
-		
-		},function(){
-			$(".tap_txt").remove(".tap_txt");
-			});
+	
+	
+	var expand;
+	var expand_id;
+
 });
 
 function no_tumb(){
@@ -801,12 +775,13 @@ function fn_previous(userid, username){
 			 flag:"previous_tumbs"
 		 },
 		 success: function(data){
-			if((data.trim()) && (data.trim() !="no_prev")){
+			if((data.trim()) && (data.trim() !="no_prev") ){
+				if( $(".li_pre").length=='')
 				$(".ul_cont_av").append(data);
-			 }
-			 else{
+			 }else 
+			if($(document).find("#no_prev").length =='')
 				$(".ul_cont_av").prepend("<p id='no_prev'>you have no previous avatars..</br>tap 'choose avatar' to keep one..</p>");
-				 }
+				 
 			}
 		 
 		 });

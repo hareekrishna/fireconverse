@@ -79,7 +79,7 @@ $filename="../../data/userprofile/newname.jpg";
        if( imagejpeg($this->dstImage1, $filename, 90)){
 		  
 		   include("csign.php");
-			 $stmt_tumb_updater=$mysqli_memdata->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$u_ID_avatar");
+			 $stmt_tumb_updater=$mysqlis->prepare("SELECT `tumb_realavatar` FROM `fireconverse`.`meminfo` WHERE `ID`=$u_ID_avatar");
 			 if($stmt_tumb_updater){
 				 $stmt_tumb_updater->execute();
 				 $stmt_tumb_updater->store_result();
@@ -91,7 +91,7 @@ $filename="../../data/userprofile/newname.jpg";
 					 $unlink=unlink($flag_tumb);
 					 }
 				
-		   $stmt_tumb_update=$mysqli->prepare("UPDATE `fireconverse`.`meminfo` SET `tumb_realavatar`='$filename' WHERE `ID`=$u_ID_avatar");
+		   $stmt_tumb_update=$mysqli->prepare("UPDATE `fireconverse`.`meminfo` SET `tumb_realavatar`='".$filename."' WHERE `ID`=$u_ID_avatar");
 		   if($stmt_tumb_update){
 		  if( $stmt_tumb_update->execute()){
 			
