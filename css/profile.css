@@ -25,7 +25,8 @@ div{
 	}
 #global_container{
 	height: 100%;
-	width: 1132px;
+	min-width: 1132px;
+	width: 83%;
 	float:left;
 	padding-left:50px;
 	padding-top:40px;	
@@ -194,7 +195,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00494949', e
 	}
 .center_body{
 	float: left;
-	width: 687px;
+	min-width: 687px;
+	width:61%;
 	margin: 30px 30px;
 	}
 #followings{
@@ -287,7 +289,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00494949', e
 	width:100%;
 	border-bottom:1px solid #DADADA;
 	}
-.follow_window_main{
+.fwng_w_main{
 	padding:10px 50px;
 	}
 .info{
@@ -295,29 +297,60 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00494949', e
 	display: inline-block;
 	float: left;
 	}
-.followings_main{
+
+.fsearch_main{
+	position:relative;
 	width: 300px;
-	height:26px;
+	height: 29px;
 	float:right;
+	right:0px;
 	}
 .Fsearchbox{
 	border: 1px solid #BCBCBC;
 	position: absolute;
-	font-size: 15px;
-	width: 300px;
-	height: 100%;
+	
+	width:100%;
+	height:100%;
+	padding:0px 5px;
 	}
 
-.main_inner ,.main_inner1{
-	padding:18px;
-	max-height: 190px;
+.fwng_main{
+
 	min-height:100%;
 	width:100%;
-	overflow-y: auto;
+	
 	}
-.followings_d{
+#flwng,#fllw{
+	display:none;
+	}
+.fwng_d{
 	min-height:190px;
 	min-width:100%;
+	}
+.fwng_d ul{
+	padding:10px 0px;
+	}
+.fwng_d ul li{
+	padding:5px 20px;
+	}
+.fwng_d ul li:hover{
+	background-color:#F5F4F4;
+	}
+.s_f_li_cb{
+	
+	}
+.s_f_li_i{
+	width:50px;
+	display:inline-block;
+	float:left;
+	}
+.s_f_li_i img{
+	width:100%;
+	box-shadow:0px 0px 2px 1px rgba(45, 45, 45, 0.34);
+	}
+.s_f_li_n{
+	float:right;
+	padding:5px;
 	}
 .mods,.mods1{
 	float:left;
@@ -597,7 +630,8 @@ li .t_li_b_m_o{
 	margin:0px 10px;
 	}
 li .t_li_b_m{
-	width:587px;
+	min-width:587px;
+	width:97%;
 	margin-top:-3px;
 	padding:10px;
 	background: rgb(255,255,255);
@@ -623,10 +657,12 @@ li .t_li_b_m_c{
 	word-break:break-all;
 	width: 100%;
 	line-height: 24px;
+
 	}
 li .t_li_b_m_c p{
 	word-break: break-word;
 	margin:10px;
+	color:#252525;
 	font-size:14px;
 	}
 li .t_li_b_m_c textarea,li .t_li_b_m_t span textarea{
@@ -771,7 +807,9 @@ li .t_li_b_m_f_l span{
 	margin:0 0 0 0;
 	padding:10px 0px;
 	width:100%;
+	
 	}
+
 .t_li_b_m_r li:hover{
 	transition:0.6s;
 	background-color: #EEEEEE;
@@ -809,6 +847,8 @@ li .t_li_b_m_f_l span{
 .t_li_b_m_r_t{
 	padding:8px;
 	margin-left: 34px;
+	width:92%;
+	overflow-wrap:break-word;
 	}
 .t_li_b_m_f_o li{
 	float:none;

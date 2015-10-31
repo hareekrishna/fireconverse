@@ -8,10 +8,9 @@ sec_session_start();
 <meta charset="utf-8">
 <title></title>
 <script src='../../js/jquery.min.js' ></script>
- <script src="../../js/quick_access.js" ></script>
+<script src="../../js/quick_access.js" ></script>
 <link rel="stylesheet" type="text/css" href="../../css/navbar.css" >
 <link rel="stylesheet" type="text/css" href="../../css/corner.css" >
-
 </head>
 
 <body>
@@ -641,19 +640,15 @@ if(login_check($mysqli) == true) {
 		
 ?>
 <div id="navbar">
-                <div class="fc_navbar">
-                    <img src="../../mydata/pics/fireconvers_navbar.png" id="fc_logo" width="201.6" height="31.8" alt="fireconverse">
-                </div>
-                <div class="options_navbar_outer">
-                	<div class="options_navbar_inner">
-                    	<ul class="options_navbar_main">
-                            <li class="navbar_list" >
-                                <img class="search_icon_gif" src="../../mydata/pics/searc.gif">
-                            </li>
-                           	<li class="navbar_list">
-                            	 <a href="index.php" ><h4 class="options_navbar_txt">home</h4></a>
-                            </li>
-                            <?PHP 
+  <div class="fc_navbar"> <img src="../../mydata/pics/fireconvers_navbar.png" id="fc_logo" width="201.6" height="31.8" alt="fireconverse"> </div>
+  <div class="options_navbar_outer">
+    <div class="options_navbar_inner">
+      <ul class="options_navbar_main">
+        <li class="navbar_list" > <img class="search_icon_gif" src="../../mydata/pics/searc.gif"> </li>
+        <li class="navbar_list"> <a href="index.php" >
+          <h4 class="options_navbar_txt">home</h4>
+          </a> </li>
+        <?PHP 
 							if($flag_options=="logged"){
 								echo '
                              <li class="navbar_list">
@@ -689,103 +684,90 @@ if(login_check($mysqli) == true) {
 							
 								}
 							?>
-                           
-                            
-                        </ul>
-                    </div>
-                    
-                </div>
+      </ul>
+    </div>
+  </div>
 </div>
 <div id="splash"></div>
 <div class="page_body">
- 	<div class="global_container">
-    	<div class="searchbox_outer">
-                    	<div class="searchbox_inner">
-                        	<div class="searchbox_main">
-                            	<input type="text" class="searchbox_top"  name="searchbox" placeholder="Search.." >
-                                <div class="search_icon">
-                                	<img src="../../mydata/pics/searc.gif" class="search_icon_gif1" id="search_icon_gif_id" >
-                                    <img src="../../mydata/pics/close.gif" class="search_icon_gif1" id="close_icon_gif_id" >
-                                </div>
-                            </div>
-                        </div>
-         </div>
-       <div class="banner_outer">
-       		<div class="banner_inner">
-            	<div class="banner_pic">
-                	<img src="" class="banner_pic_img">
-                </div>
-                <div class="grad_pics">
-                </div>
-                <div class="title_container">
-                	<div>
-                    	<h1></h1>
-                    </div>
-                </div>
-            </div>
-       </div>  
-       <div class="head_container">
-       		 <div class="start_outer">
-             <div class="start_inner">
-                 <div class="start_title">
-                      <p>Start something new..</p>
-                 </div>
-                 <div class="start_items">
-                    <ul class="start_items_list">
-                       <li id="st_t"><a>Start Topic</a></li>
-                        <li id="st_g"><a href="start.php#group">Start Group</a></li>
-                        <li id="st_c"><a href="start.php#corner">Start Corner</a></li>
-                    </ul>
-                </div>
-            </div>
-       </div>
-       		 <div id="status_outer">
-                <div id="status_body">
-                    <div id="qoute_pic">
-                    	<div >
-                        <img class="status_quote_pic" src="../../mydata/pics/quotation-marks.gif">
-                       	</div>
-                        <div class="status_text">
-                        	<p></p>
-                        </div>
-                        
-                    </div>
-                </div>
-            <div class="rev_div">
-            	<img class="status_quote_pic" id="status_quote_pic_rev" src="../../mydata/pics/quotation-marks.gif">
-           </div>
+  <div class="global_container">
+    <div class="searchbox_outer">
+      <div class="searchbox_inner">
+        <div class="searchbox_main">
+          <input type="text" class="searchbox_top"  name="searchbox" placeholder="Search.." >
+          <div class="search_icon"> <img src="../../mydata/pics/searc.gif" class="search_icon_gif1" id="search_icon_gif_id" > <img src="../../mydata/pics/close.gif" class="search_icon_gif1" id="close_icon_gif_id" > </div>
         </div>
-        
-       </div>
-       <div class="dashboard_outer">
-       		<div class="dashboard_inner">
-            	<p class="db_title">Dashboard</p><br/>
-            	<div class="dashboard_main">
-                	<div class="field" id="start_date">
-                    	<p class="f_t">Created on</p>
-                        <p class="f_t_v"></p>
-                    </div><br/>
-                    <div class="field" id="c_follow">
-                    	<p class="f_t">Followers</p>
-                        <p class="f_t_v"></p>
-                    </div><br/>
-                   <div class="field" id="c_admin">
-                   		<p class="f_t">Admin</p>
-                        <p class="f_t_v"></p>
-                   </div><br/>
-                </div>
-            </div>
-       </div>
-       <div class="main_body">
-       	 <div class="topics_list_outer">
-               		<div class="topics_list_inner">
-                    	<div class="topics_list">
-                        	
-                        </div>
-                    </div>
-               </div>
-       </div>
+      </div>
     </div>
+    <div class="banner_outer">
+      <div class="banner_inner">
+        <div class="banner_pic"> <img src="" class="banner_pic_img"> </div>
+        <div class="grad_pics"> </div>
+        <div class="title_container">
+          <div>
+            <h1></h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="head_container">
+      <div class="start_outer">
+        <div class="start_inner">
+          <div class="start_title">
+            <p>Start something new..</p>
+          </div>
+          <div class="start_items">
+            <ul class="start_items_list">
+              <li id="st_t"><a>Start Topic</a></li>
+              <li id="st_g"><a href="start.php#group">Start Group</a></li>
+              <li id="st_c"><a href="start.php#corner">Start Corner</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div id="status_outer">
+        <div id="status_body">
+          <div id="qoute_pic">
+            <div > <img class="status_quote_pic" src="../../mydata/pics/quotation-marks.gif"> </div>
+            <div class="status_text">
+              <p></p>
+            </div>
+          </div>
+        </div>
+        <div class="rev_div"> <img class="status_quote_pic" id="status_quote_pic_rev" src="../../mydata/pics/quotation-marks.gif"> </div>
+      </div>
+    </div>
+    <div class="dashboard_outer">
+      <div class="dashboard_inner">
+        <p class="db_title">Dashboard</p>
+        <br/>
+        <div class="dashboard_main">
+          <div class="field" id="start_date">
+            <p class="f_t">Created on</p>
+            <p class="f_t_v"></p>
+          </div>
+          <br/>
+          <div class="field" id="c_follow">
+            <p class="f_t">Followers</p>
+            <p class="f_t_v"></p>
+          </div>
+          <br/>
+          <div class="field" id="c_admin">
+            <p class="f_t">Admin</p>
+            <p class="f_t_v"></p>
+          </div>
+          <br/>
+        </div>
+      </div>
+    </div>
+    <div class="main_body">
+      <div class="topics_list_outer">
+        <div class="topics_list_inner">
+          <div class="topics_list"> </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>

@@ -11,6 +11,8 @@
 			<script src='../../js/jquery.min.js' ></script>
             <script src="../../js/profile_page.js" ></script>
             <script src="../../js/quick_access.js" ></script>
+            <script src="//cdn.jsdelivr.net/emojione/1.5.0/lib/js/emojione.min.js"></script>
+            <link rel="stylesheet" href="//cdn.jsdelivr.net/emojione/1.5.0/assets/css/emojione.min.css" />
             <link rel="stylesheet" type="text/css" href="../../css/navbar.css" >
        		<link rel="stylesheet" type="text/css" href="../../css/profile.css" >
         </head>
@@ -19,6 +21,7 @@
         <?php
 			include 'login_status.php';
 			require_once 'csign.php';
+			
 			$verified_corner_name="";
 			$verified_room="";
 			$verified_corner_name_1="";	
@@ -31,7 +34,10 @@
 					 $u_email=$_SESSION['u_email'];
 					 $u_name=$_SESSION['u_name'];
 					 $flag_options="logged";
-					 
+					 include 'infogiver.php';
+					 $tumb_array=tumb();
+					 $admin_array=admin("true");
+					 $nav=navbar_info();
 				 }
 			 }
 			 else
@@ -54,6 +60,7 @@
                                          <a href="index.php" ><h4 class="options_navbar_txt">home</h4></a>
                                     </li>
                                     <?PHP 
+									
                                     if($flag_options=="logged"){
                                         echo '
                                    
@@ -69,7 +76,14 @@
                                     </li>
                                     <li class="navbar_list" id="hide1">
                                         <a href="logout.php"><h4 class="options_navbar_txt">log-out</h4></a>
-                                    </li>  ';
+                                    </li> 
+									<li class="navbar_list" id="quick_acces_icon_o">
+                                    	<img id="quick_acces_icon" src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
+                                    </li>
+									<li class="navbar_list" id="avatar_navbar_list"><a href="profile.php"><img id="avatar_navbar" src="'.$nav['tumb'].'"></a> </li>
+                                     '.$nav['fonts'].'
+									 <li class="navbar_list"><a href="profile.php"><h4 class="options_navbar_txt" style="font-family:'.$nav['fontname'].'">'.$nav['sign'].'</h4></a></li>
+                                     ';
                                     }
                                     else {
                                     echo '
@@ -86,14 +100,13 @@
                                     <li class="navbar_list" id="hide">
                                         <a href="help.php"><h4 class="options_navbar_txt">help</h4></a>
                                     </li>
-                                     ';
-                                    
-                                        }
-                                    ?>
-                                    <li class='navbar_list' id='quick_acces_icon_o'>
-                                    	<img id='quick_acces_icon' src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
-                                    </li>
-                                    	
+									
+								
+                                    	';
+									} 
+									
+									?>
+										
                                 </ul>
                             </div>
                             
@@ -156,13 +169,13 @@
                             </div>
                 <div id="topbar" >
                     <div id="cover_pic">
-                        <img id="cover_pic_main" src=""/>
+                        <img id="cover_pic_main" src='<?PHP echo $tumb_array['wrapper']; ?>'/>
                         <div class="grad_pics">
                          </div>
             
                     </div>
                     <div id="pics">
-                        <img src="" id="user_avatar" style="display:block" alt="No Photo Available." draggable="false" >
+                        <img src='<?PHP echo $tumb_array['tumb']; ?>' id="user_avatar" style="display:block" alt="No Photo Available." draggable="false" >
                     </div>
                     <div id="container">
                         <div id="username" >
@@ -183,7 +196,9 @@
                         <div id="status_body">
                             <div id="qoute_pic">
                                 <img id="status_quote_pic" src="../../mydata/pics/quotation-marks.gif">
-                               <p class="status_main"></p>
+                               <p class="status_main">
+                               		<?PHP echo $tumb_array['status']; ?>
+                               </p>
                                 <div id="status_sign_body">
                                     
                                    <p id='status_sign'></p><p id='status_sign_id'></p>
@@ -198,10 +213,18 @@
                         <div id="admin_panel">
                             <p id="admin">Admin Panel</p>
                             <div id="corner_names">
+                            	<?PHP 
+								if($admin_array !='notfound'){
+									foreach($admin_array as $admin_array_temp)
+									echo "<div class='corner_info'><p class='corner_info_name'><a href=corner.php?cid=".intval($admin_array_temp['corner_id']).">".$admin_array_temp['corner_name']."</a></p>
+										<p class='corner_info_desc'>".$admin_array_temp['corner_desc']."</p></div>";
+									}
+									else{
+										echo ' <p id="no_corner">No corners yet by you.. </p>';
+										}
+								?>
                             </div>
-                            <p id="no_corner">
-                                
-                            </p>
+                           
                         </div>
                     
                         <div id="followings">
@@ -225,20 +248,36 @@
                                     <input type="radio" name="follow_select" id="radio_follows" ><label for="radio_follows" class="follow_label"><h2>follows..</h2></label>
                                 </form>
                             </div>
-                            <div class="follow_window_main">
-                                <div class="followings_main">
-                                    <div class="text1">
+                            <div class="fwng_w_main" id="flwng">
+                                <div class="fwng_main">
+                                    <div class="f_text">
                                         <p class="info">People who follows you..</p>
                                     </div>
-                                    <div class="searchbox_main">
+                                    <div class="fsearch_main">
                                         <input type="text" class="Fsearchbox" id="followings_search" placeholder="Search a name..">
                                         <div class="search_icon">
-                                            <img src="../../mydata/pics/searc.gif" alt="Done" class="search_icon_gif1" />
+                                            <img src="../../mydata/pics/searc.gif" alt="Done" class="search_icon_gif1"  />
                                         </div>
                                     </div>
-                                    <div class="followings_d"></div>
+                                    <div class="fwng_d"></div>
+                                </div>
+                           </div>
+                            
+                            <div class="fwng_w_main" id="fllw">
+                                <div class="fwng_main">
+                                    <div class="f_text">
+                                        <p class="info">People whom you are following..</p>
+                                    </div>
+                                    <div class="fsearch_main">
+                                        <input type="text" class="Fsearchbox" id="follows_search" placeholder="Search a name..">
+                                        <div class="search_icon">	
+                                            <img src="../../mydata/pics/searc.gif" alt="Done" class="search_icon_gif1"  />
+                                        </div>
+                                    </div>
+                                    <div class="fwng_d"></div>
                                 </div>
                             </div>
+                             
                         </div>
                     </div>
                     
@@ -265,6 +304,7 @@
                                 </div>
                             </div>
                        </div>
+                    </div>
                     </div>
                  </div>
                     

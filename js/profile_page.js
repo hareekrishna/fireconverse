@@ -723,7 +723,22 @@ function done_edit(){
 		});
 	}
 
-	
+	function cres_open(){
+		$(document).one("click",".c_res_op",function(){
+			var r_id='#'+$(this).parents("li").attr("id");
+			var t_id='#'+$(this).parents(".topics_li").attr("id");
+			if($(document).find(t_id).find(r_id).find(".c_r_o_o").html() ==null){
+				var append_div="<div class='c_r_o_o'><div class='c_r_o_i'>";
+					append_div+="<div class='c_r_t' />"+
+								"<input type='text' name='cres_text' class='text_box' placeholder='Write your CounterResponse..' /></div>"+
+								"<div class='c_r_d'><input type='button' name='cres_done' value='Done' /></div>"+
+								"</div></div>";
+								
+				$(append_div).appendTo($(document).find(r_id));
+			}
+				
+			});
+		}
 function makeNewPosition(){
     
     // Get viewport dimensions (remove the dimension of the div)
@@ -764,7 +779,7 @@ function calcSpeed(prev, next) {
     return speed;
 
 }
-var f
+var f;
 var f_s=[];
 var f1_s=[];
 function follows(){
@@ -788,9 +803,9 @@ function follows(){
 $(function(){
 	
 	setTimeout(function(){animateDiv();},200);
-	sign();
-	tumb();
-	admin();
+	//sign();
+	//tumb();
+	//admin();
 	var configaration={
 						'ID':false,
 						'room':false,
@@ -823,7 +838,7 @@ $(function(){
 		//--------------------------------------------------------------follows
 	follows();
 	$(document).on("mouseenter",".topics_li li",function(){
-		$(this).find(".t_li_h_t").prepend("<img class='c_res_op' src='../../mydata/pics/counter_respond.png' /><img class='delete_op' src='../../mydata/pics/delete.png'>");
+		$(this).find(".t_li_h_t").prepend("<img class='c_res_op' onClick='cres_open();' src='../../mydata/pics/counter_respond.png' /><img class='delete_op' src='../../mydata/pics/delete.png'>");
 			});
 		$(document).on("mouseleave",".topics_li li",function(){
 			$(this).find(".t_li_h_t .c_res_op,.t_li_h_t .delete_op").remove();
@@ -831,8 +846,8 @@ $(function(){
 		$("#view_f ,#radio_followings").click(function(){
 			$("#splash").fadeIn(300).show();
 			$(".follow_window_outer").fadeIn(400).show();
-			$(".Fsearchbox").attr("id","followings_search");
-			$(".text1 p").html("People who follows you.. ");
+			$("#fllw").css({'display':'none'});
+			$("#flwng").show();
 				$.ajax({
 					url:'follow.php',
 					dataType:"text",
@@ -879,9 +894,9 @@ $(function(){
 			});
 			var f1;
 	$(document).on("click" , "#radio_follows" ,function(){
-		$(".text1 p").html("People whom you follows.. ");
-		$(".Fsearchbox").attr("id","follows_search");
-		$(".main_inner").fadeOut();
+		$("#flwng").css({'display':'none'});
+		$("#fllw").show();
+		
 		$.ajax({
 					url:'follow.php',
 					dataType:"text",
@@ -899,7 +914,7 @@ $(function(){
 					success:function(data){
 						
 						 if(!data){
-							 b="<div class='main_inner1' ><p class='info'>You are following no one.</br>Get updates from people by following them.</p></div>";
+							 b="<div><p class='info'>You are following no one.</br>Get updates from people by following them.</p></div>";
 							 }
 						else{
 						f1=JSON.parse(data);
@@ -958,18 +973,51 @@ $(function(){
 			
 		});
 		
-	$(document).on("keyup","#follows_search",function(){
-	
+	$(document).on("click","#fllw .search_icon_gif1",function(){
+		var mem_name=$("#follows_search").val(); 
 		$.ajax({
 			
-			url:'follow.php',
+			url:'infogiver.php',
 			dataType:'text',
 			method:'POST',
 			data:{
-				flag:'search_mems'
+				flag:'search_members',
+				key_term:mem_name
 				},
+			beforeSend:function(){
+						if($(".loadgif_f").length ==0){
+							$("#fllw .fwng_d").append("<div class='loadgif_f'><img src='../../mydata/pics/ajax_loader.gif'></div>");
+						}
+						},
+			
 			success:function(data){
-				alert(data);
+				var info=JSON.parse(data);
+				$(".loadgif_f").remove();
+				if(info != null){
+					var append="<ul>";
+					var temp;
+					$.each(info,function(index,val){
+						temp="<li id='s_f_li_"+info[index].ID+"' >";
+						if(info[index]['follow_check'].he)
+							temp="<li id='s_f_li_"+info[index].ID+"' class='s_f_li_cb'>";
+						if(info[index]['follow_check'].me)
+							temp="<li id='s_f_li_"+info[index].ID+"' class='s_f_li_cg'>";
+						
+						append+=temp+"<div><span class='s_f_li_i'><img src='"+info[index].tumb+"' alt='No photo available' /></span>"
+								+"<span class='s_f_li_n'><a href='people.php?ppl="+info[index].ID+"'><p>"+info[index].name+"</p></a></span>";
+						if(info[index]['follow_check'].he)
+								append+="<br/><p class='fllw_chck_h'>Follows you</p>";
+						if(info[index]['follow_check'].me)
+								append+="<br/><p class='fllw_chck_m'>Unfollow</p>";
+						else append+="<br/><p class='fllw_chck_m'>Follow</p>";
+						});
+					append+="</ul>";
+					$("#fllw .fwng_d ul").remove();
+					$(append).appendTo("#fllw .fwng_d");
+					}
+				else{
+					
+					}
 				}
 			});
 		});

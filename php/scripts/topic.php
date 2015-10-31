@@ -1,4 +1,4 @@
-
+ 
 <?PHP
 	include("secure_session.php");
 	sec_session_start(); 
@@ -41,171 +41,6 @@
 					}
 				return params;
 			} 
-			function mem_info(id_list,fn){
-				var info1;
-				
-				$.ajax({
-					url:'infogiver.php',
-					method:'post',
-					dataType:'text',
-					data:{
-						flag:'mem_info',
-						id_list:id_list
-						},
-					success:function(data){
-												
-						if(data){
-							info1=JSON.parse(data);
-							fn(info1);
-							}
-					},
-					error:function(jXHR,textStatus,errorThrown){
-						alert(errorThrown);
-					}
-				});
-				
-				}
-			function show_responses(t_id){
-				var t_id1=t_id_url;
-				var count_res_start=-10;
-				var count_res_end=0;
-				$(document).find(".ft_m_r_no").remove();
-				if($(document).find(".ft_m_r_r").length == 0){
-						$.ajax({
-								url:'infogiver.php',
-								method:"post",
-								dataType:"text",
-								data:{
-									flag:"show_responses",
-									topic_id:t_id1,
-									count_res_start:count_res_start,
-									count_res_end:count_res_end
-									},
-								success:function(data){
-									if(data){
-										var info=JSON.parse(data);
-										if(info[0]){
-										var append_div1; 
-										append_div1="<div class='ft_m_r_r'><ul>";
-											$.each(info,function(index,val){
-												
-													append_div1 +="<li id='res_id_"+info[index].res_id+"'>"
-																+"<span><p>"+info[index].mem_name+"</p></span>"
-																+"<div class='ft_m_r_r_li'><input type='hidden' value='' id='del_res_flag'> <p>"+info[index].date_of_res+"</p></div><br/>"
-																+"<div class='ft_m_r_r_li_tu'>"
-																+"<span><img src='"+info[index].mem_tumb+"'/></span></div>"
-																+"<div class='ft_m_r_r_li_c'><p>"+info[index].res_text+"</p></div></li>";
-																
-																	
-												});
-												append_div1+="</ul></div>";
-												
-											$(append_div1).appendTo($(document).find(".ft_main_res"));	
-											}
-										}
-									else{
-										alert("Oops!Something wrong might have occured!.Please try again.");
-										}
-									
-									},
-								error:function(jXHR,textStatus,errorThrown){
-									alert(errorThrown);
-									}
-							});
-					}
-				}
-
-			function topic_info_single(topic_id){
-				var append_div,topic_info=[],liked='../../mydata/pics/like.png';
-				
-				if(topic_id){
-					$.ajax({
-						url:'infogiver.php',
-						dataType:"text",
-						method:"post",
-						data:{
-							flag:'topic_info_single',
-							topic_id:topic_id
-							},
-						success:function(data){
-							if(data != false){
-								if(data=='itsarticle!') window.location.replace("article.php?article="+topic_id);
-								if(data=='itspoll!') window.location.replace("poll.php?poll="+topic_id);
-								var info=JSON.parse(data);
-								if(info){
-									var ft_id="ft_id_"+info[0].topic_id;
-									$(".ft_main").attr("id",ft_id);
-									if(info[0].auth==0) $(".ft_m_h_i_o").remove();
-									var id_list=[];
-									id_list[0]=info[0].ID;
-									
-									mem_info(id_list,function(mem_info_list){
-										flag=0;
-										switch(info[0].room_id){
-											case '1':
-												topic_info['room_id']='Sports';
-												break;
-											case '2':
-												topic_info['room_id']='Health';
-												break;
-											case '3':
-												topic_info['room_id']='Movies';
-												break;
-											case '4':
-												topic_info['room_id']='Fashion';
-												break;
-											case '5':
-												topic_info['room_id']='Tech';
-												break;
-											default:flag=1;
-										}
-										if(flag) return;
-										switch(info[0].liked){
-											case '1':	
-												liked="../../mydata/pics/liked.png";
-												liked_id='liked_i';
-											break;
-											case '-1':
-												liked="../../mydata/pics/disliked.png";
-												liked_id='disliked_i';
-											break;
-											case '0':
-												liked="../../mydata/pics/like.png";
-												liked_id='like_i';
-											break;
-											}
-										append_div="<div class='ft_author'><span class='ft_a_room'><p>"+topic_info['room_id']+"</p></span>";
-										append_div+="<span class='ft_a_d'><img src='../../mydata/pics/arrow.png' /></span>";
-										if(info[0].corner_name){
-											append_div+="<span class='ft_a_coner'><a href='corner.php?cid="+info[0].corner_id+"'><p>avengers</p></a></span>";
-											append_div+="<span class='ft_a_d'><img src='../../mydata/pics/arrow.png' /></span>";
-											
-											}
-										append_div+="<span class='ft_a_u'><a href='people.php?ppl="+info[0].ID+"'><p>"+mem_info_list[0].u_name+"</p></span>";
-										append_div+="</div>";
-										$(append_div).prependTo(".ft_inner");
-										show_reponses(info[0].topic_id);
-										$(".ft_main_tumb img").attr('src',mem_info_list[0].tumb);
-										$(".ft_m_h_t h2").html(info[0].t_title);
-										$(".ft_m_h_i_li p").html(info[0].likes);
-										$(".ft_m_h_i_di p").html(info[0].dislikes);
-										$(".ft_m_h_i_d img").attr("src",liked).attr("id",liked_id);
-										$(".ft_m_h_i_dat p").html(info[0].t_date);
-										$(".ft_m_b_t p").html(info[0].topic);
-										if(info[0].data) $(".ft_m_b_p").css({'display':'inline-block'});
-										$(".ft_m_b_p span img").attr("src",info[0].data);
-										room_nav_color(info[0].room_id);
-										});
-									
-									}
-								}
-							},
-						error:function(jXHR,textStatus,errorThrown){
-							alert(errorThrown);
-							}
-						});
-					}
-				}
 			
 		function likes(){ 
 			$(".ft_m_h_i").one("click",".ft_m_h_i_d span img",function(){
@@ -376,8 +211,8 @@
 							$(document).find(".ft_m_h_t span").animate({'margin-left':0});
 							 
 							
-							$("<textarea ></textarea>").appendTo($(document).find(".ft_m_b_t")).val(text);
-							$("<textarea maxlength='100'></textarea>").appendTo($(document).find(".ft_m_h_t")).val(text1);
+							$("<textarea class='r_e_textarea' ></textarea>").appendTo($(document).find(".ft_m_b_t")).val(text);
+							$("<textarea class='r_e_textarea' maxlength='100'></textarea>").appendTo($(document).find(".ft_m_h_t")).val(text1);
 							
 							var append_div="<div class='edit_buttons'><span><button onClick='cancel_edit()'>Cancel</button><button onClick='done_edit()'>Done</button></span></div>";
 							$(append_div).appendTo($(document).find(".ft_m_b_t"));
@@ -485,7 +320,7 @@
 								method:"post",
 								data:{
 									flag:"edit_topic",
-									topic_id:t_id1,
+									topic_id:t_id_url,
 									edit:edit,
 									edit1:edit1
 									},
@@ -530,20 +365,26 @@
 			$(function(){
 				url_info=getURLparams(window.location.search);
 				t_id_url=url_info['topic'][0]; 
-				if(Math.floor(t_id_url) == t_id_url && $.isNumeric(t_id_url))
-					topic_info_single(t_id_url);
-				else {//------ oops page
-					}
+				if(Math.floor(t_id_url) != t_id_url && $.isNumeric(t_id_url))
+					window.location.replace("404.html");
+				
 					
 				$("#splash").click(function(){
 					$(".follow_window_outer,#splash").fadeOut("slow");hide();
 					close_likers_list();
 					cancel_delete_topic();
 					});
+				$(document).on("mouseenter",".ft_m_r_r li",function(){
+					$(this).find(".ft_m_r_r_li").prepend("<img class='c_res_op' src='../../mydata/pics/counter_respond.png' /><img class='delete_op' src='../../mydata/pics/delete.png'>");
+					});
+				$(document).on("mouseleave",".ft_m_r_r li",function(){
+					$(this).find(".ft_m_r_r_li .c_res_op,.ft_m_r_r_li .delete_op").remove();
+					});
 					
 				});
         </script>
          <?php
+		 if($_GET['topic']){
 			include 'login_status.php';
 			require_once 'csign.php';
 			$verified_corner_name="";
@@ -558,9 +399,26 @@
 					 $u_email=$_SESSION['u_email'];
 					 $u_name=$_SESSION['u_name'];
 					 $flag_options="logged";
+					 include 'infogiver.php';
+					 $tumb_array=tumb();
+					 $admin_array=admin("true");
+					 $nav=navbar_info();
 					 
 				 }
 			 }
+			 
+			 include_once("infogiver.php");
+			 $config['topic_id']=intval($_GET['topic']);
+			 $config['start']=-10;
+			 $config['end']=0;
+			if($topic_array=(topic_info_single_non($config))){ //print_r($topic_array);
+				}
+			else
+			 	if($topic_array[0]['topic_id'] =='')
+				header ("location:404.html");
+				
+			
+		 }
 							
         ?>
          <div id="splash"></div>
@@ -593,7 +451,14 @@
                                     </li>
                                     <li class="navbar_list" id="hide1">
                                         <a href="logout.php"><h4 class="options_navbar_txt">log-out</h4></a>
-                                    </li>  ';
+                                    </li> 
+									<li class="navbar_list" id="quick_acces_icon_o">
+                                    	<img id="quick_acces_icon" src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
+                                    </li>
+									<li class="navbar_list" id="avatar_navbar_list"><a href="profile.php"><img id="avatar_navbar" src="'.$nav['tumb'].'"></a> </li>
+                                     '.$nav['fonts'].'
+									 <li class="navbar_list"><a href="profile.php"><h4 class="options_navbar_txt" style="font-family:'.$nav['fontname'].'">'.$nav['sign'].'</h4></a></li>
+                                     ';
                                     }
                                     else {
                                     echo '
@@ -614,9 +479,7 @@
                                     
                                         }
                                     ?>
-                                    <li class='navbar_list' id='quick_acces_icon_o'>
-                                    	<img id='quick_acces_icon' src="../../mydata/pics/qiuck_access.png"  alt="Quick Access">
-                                    </li>
+                                   
                                   
                                     
                                 </ul>
@@ -671,28 +534,49 @@
                     	<div class="main_body">
                         	<div class="ft_outer">
                             	<div class="ft_inner">
-                                	<div class="ft_main">
+                                	<div class='ft_author'>
+                                        	<span class='ft_a_room'>
+                                            	<p><?PHP echo $topic_array[0]['room_name']; echo "<script>room_nav_color(".$topic_array[0]['room_id'].")</script>"; ?></p>
+                                            </span>
+											<span class='ft_a_d'>
+                                            	<img src='../../mydata/pics/arrow.png' />
+                                            </span>
+                                           	<?PHP 
+												if($topic_array[0]['corner_name'] !=''){
+													
+												echo "<span class='ft_a_coner'><a href='corner.php?cid=".$topic_array[0]['corner_id']."'><p>".$topic_array[0]['corner_name']."</p></a></span><span class='ft_a_d'><img src='../../mydata/pics/arrow.png' /></span>";
+											}
+												
+											?>
+                                            <span class='ft_a_u'>
+                                            	<a href='people.php?ppl=<?PHP echo $topic_array[0]['ID']; ?>'>
+                                                	<p><?PHP echo $topic_array[0]['name']; ?></p>
+                                                </a>
+                                           </span>
+                                       </div>
+                                	<div class="ft_main" id='ft_id_<?PHP echo $topic_array[0]['topic_id'] ?>' >
+                                    	
                                     	<div class="ft_main_header">
                                             <div class="ft_main_tumb">
-                                                <img src="../../mydata/pics/unknownuser.jpg" alt="Picture unavailable." />
+                                                <img src='<?PHP echo $topic_array[0]['tumb']; ?>' alt="Picture unavailable." />
                                             </div>
                                             <div class="ft_m_h_c">
                                             	<div class="ft_m_h_t">
-                                                	<h2></h2>
+                                                	<h2><?PHP echo $topic_array[0]['t_title']; ?></h2>
                                                 </div>
                                                 <div class="ft_m_h_i">
                                                 	<div class="ft_m_h_i_d">
                                                     	<span>
-                                                        	<img onClick="likes()" src="../../mydata/pics/like.png" alt="like" />
+                                                        	<img onClick="likes()" src='<?PHP echo $topic_array[0]['liked']; ?>' id='<?PHP echo $topic_array[0]['liked_id']; ?>'alt="like" />
                                                         </span>
                                                     </div>
                                                     <div class="ft_m_h_i_l">
                                                     	<div class="ft_m_h_i_li" onClick="show_likers()">
-                                                        	<p>0</p>
+                                                        	<p><?PHP echo $topic_array[0]['likes']; ?></p>
                                                             <span>likes</span>
                                                         </div>
                                                         <div class="ft_m_h_i_di" onClick="show_dislikers()">
-                                                        	<p>0</p>
+                                                        	<p><?PHP echo $topic_array[0]['dislikes']; ?></p> 
                                                             <span>dislikes</span>
                                                         </div>
                                                         
@@ -702,21 +586,25 @@
                                                        
                                                     </div>
       												<div class="ft_m_h_i_dat">
-                                                        <p></p>
+                                                        <p><?PHP echo $topic_array[0]['t_date']; ?></p>
                                                     </div>                                       
                                                 </div>
                                               
                                             </div>
                                     </div>
                                     <div class="ft_main_body">
-                                    	<div class="ft_m_b_p">
+                                    	<?PHP if($topic_array[0]['data'] )
+                                    			echo "<div class='ft_m_b_p'>";
+											else 
+												echo "<div class='ft_m_b_p' style='display:none'>";
+											?>
                                         	<span>
-                                            	<img onClick="show_large_pic()" src="" alt="" />
+                                            	<img onClick="show_large_pic()" src='<?PHP echo $topic_array[0]['data'] ;?>' alt="" />
                                             </span>
                                         </div>
                                     	<div class="ft_m_b_t">
                                         	<span>
-                                            	<p></p>
+                                            	<p><?PHP echo $topic_array[0]['topic'];?></p>
                                             </span>
                                         </div>
                                         <div class="ft_m_b_re">
@@ -724,11 +612,46 @@
                                         </div>
                                     </div>
                                     <div class="ft_main_res">
-                                    	<div class="ft_m_r_no">
-                                        	<span>
-                                            	<p>Be the first to respond..</p>
+                                    	<?PHP 
+											if($topic_array[0]['responses'] == null ){
+												 echo "<div class='ft_m_r_no'>
+													<span>
+														<p>Be the first to respond..</p>
+													</span>
+												</div>";
+											}
+											else{
+												echo '<div class="ft_m_r_r"><ul>';
+												foreach ($topic_array[0]['responses'] as $responses){
+													echo "<li id='res_id_".$responses['RES_ID']."'>
+															<span class='ft_m_r_n'><a href='people.php?ppl=".$responses['U_ID']."'><p>".$responses['name']."</p></a></span>
+															<div class='ft_m_r_r_li'>";
+															if($responses['U_ID'] == $_SESSION['u_ID'])
+																echo "<input type='hidden' value='0' id='del_res_flag'/>";
+															else 
+																echo "<input type='hidden' value='1' id='del_res_flag'/>";
+															
+															echo "<p>".$responses['res_time']."</p></div> <br/>
+															
+																<div class='ft_m_r_r_li_tu'>
+																<span><img src='".$responses['tumb']."'/></span></div>
+																<div class='ft_m_r_r_li_c'><p>".$responses['res_content']."</p></div></li>";
+													$responses=array();
+													}
+												echo '</ul></div>';
+												}
+										?>
+                                        
+                                    </div>
+                                    <div class="ft_main_foot">
+                                    	<form name='res_form' id="res_form" >
+                                        	<span class="res_form_t">
+                                            	<textarea draggable="true"  name='res_box' class="res_textarea" placeholder="Write your response.." ></textarea>
                                             </span>
-                                        </div>
+                                            <span>
+                                            	<input type="button" name="res_done" value="Done">
+                                            </span>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

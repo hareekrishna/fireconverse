@@ -1,4 +1,5 @@
 <?PHP 
+if(!function_exists('sec_session_start')){
 	function sec_session_start() {
 			$session_name = 'sec_session_id';
 			$secure = false;
@@ -12,4 +13,5 @@
 				}
 			session_regenerate_id(); 	 
 	}
+}
 ?>

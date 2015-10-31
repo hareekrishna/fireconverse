@@ -12,32 +12,36 @@ function scroller(configaration){
 function room_nav_color(room_id){
 	var bg,bb;
 	switch(room_id){
-		case '1':
+		case 1:
 				 bg="rgba(241, 76, 76, 0.42)";
     		     bb="1px solid #DE6767";
 				 break;
-		case '2':
+		case 2:
 				bg="rgba(121, 239, 230, 0.43)";
 				bb="1px solid #49BFBA";
 				break;
-		case '3':
+		case 3:
 				bg="rgba(6, 115, 111, 0.48)";
 				bb="1px solid #0EADA6";
 				break;
-		case '4':
+		case 4:
 				bg="rgba(119, 120, 121, 0.52)";
 				bb="1px solid #939696";
 				break;
-		case '5':
+		case 5:
 				bg='rgba(74, 71, 71, 0.56)';
 				bb='1px solid #717575';
 				break;
+		default:
+				 bg="rgba(241, 76, 76, 0.42)";
+    		     bb="1px solid #DE6767";
+				 break;
 		}
 	$(document).scroll(function(){
 		var top=$(document).scrollTop();
 			if(top>40){
 				$("#navbar").css({'background-color':bg,'border-bottom':bb});
-				$(".options_navbar_txt").css({'color':'#E4E4E4'});
+				$(".options_navbar_txt").css({'color':'rgb(204, 204, 204)'});
 				}
 			else{
 				$("#navbar").css({'background-color':'','border-bottom':''});
@@ -59,15 +63,15 @@ function sign_bar(){
 			},
 		success: function(data){	
 			var f=JSON.parse(data);
-			var append="<li class='navbar_list' id='avatar_navbar_list'><a href='profile.php'><img id='avatar_navbar' src='"+f[0].tumb+"'></a> </li>";
-			append+=f[0].fonts+"<li class='navbar_list'><a href='profile.php'><h4 class='options_navbar_txt' style='font-family:"+f[0].fontname+"'>"+f[0].sign+"</h4></a></li>";
+			var append="<li class='navbar_list' id='avatar_navbar_list'><a href='profile.php'><img id='avatar_navbar' src='"+f['tumb']+"'></a> </li>";
+			append+=f['fonts']+"<li class='navbar_list'><a href='profile.php'><h4 class='options_navbar_txt' style='font-family:"+f['fontname']+"'>"+f['sign']+"</h4></a></li>";
 			$(append).appendTo(".options_navbar_main");
 			
 			}
 		});
 	}
 $(function(){
-	sign_bar();
+	//sign_bar();
 	$(".options_icon_gif").click(function(){
 			var flag=$("#hide").css("display");
 			if(flag=="none"){
